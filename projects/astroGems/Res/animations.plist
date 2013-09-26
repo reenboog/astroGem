@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>guitar</key>
+	<dict>
+		<key>frames</key>
+		<string>1,2,3,2</string>
+		<key>delay</key>
+		<real>0.1</real>
+	</dict>
+	<key>keyboard</key>
+	<dict>
+		<key>frames</key>
+		<string>1,2,3,2</string>
+		<key>delay</key>
+		<real>0.1</real>
+	</dict>
+	<key>plectrum</key>
+	<dict>
+		<key>frames</key>
+		<string>1,2,3,2</string>
+		<key>delay</key>
+		<real>0.1</real>
+	</dict>
+	<key>sax</key>
+	<dict>
+		<key>frames</key>
+		<string>1,2,3,2</string>
+		<key>delay</key>
+		<real>0.1</real>
+	</dict>
+	<key>mark</key>
+	<dict>
+		<key>frames</key>
+		<string>1,2,3,2</string>
+		<key>delay</key>
+		<real>0.1</real>
+	</dict>
+	<key>mic</key>
+	<dict>
+		<key>frames</key>
+		<string>1,2,3,2</string>
+		<key>delay</key>
+		<real>0.1</real>
+	</dict>
+	<key>gemDeath</key>
+	<dict>
+		<key>frames</key>
+		<string>0,1,2,3,4,5</string>
+		<key>delay</key>
+		<real>0.1</real>
+	</dict>
+	<key>note</key>
+	<dict>
+		<key>frames</key>
+		<string>0,1,2,3,4,5,6,7,8,9,10,11,10,9,8,7,6,5,4,3,2,1</string>
+		<key>delay</key>
+		<real>0.1</real>
+	</dict>
+</dict>
+</plist>
