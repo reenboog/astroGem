@@ -21,8 +21,8 @@
 
 #define kTransformationTime 0.3f
 
-#define kColumnsFallDelay 0
-#define kRowsFallDelay 0
+#define kColumnsFallDelay 0.8
+#define kRowsFallDelay 0.8
 
 #define kPlayersAmount 2
 

@@ -26,7 +26,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
     
-    FileUtils::getInstance()->addSearchPath("Res");
+    FileUtils::getInstance()->addSearchPath("Res/1136x640");
+    FileUtils::getInstance()->addSearchPath("Res/shared");
     
     // load game config
     GameConfig::sharedInstance()->load();

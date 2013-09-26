@@ -53,7 +53,7 @@ bool GameScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Point origin = Director::getInstance()->getVisibleOrigin();
 
-    back = Sprite::create("gameBack.png");
+    back = Sprite::create("backgrounds/bgr00.jpg");
     back->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 
     this->addChild(back, 0);
