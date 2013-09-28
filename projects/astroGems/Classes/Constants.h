@@ -32,12 +32,14 @@ const bool kPreloadField = false;
 
 enum GemColour {
 	GC_Random,
-	GC_Guitar,
-	GC_Keyboard,
-	GC_Microphone,
-	GC_Saxophone,
-	GC_Plectrum,
-    GC_Question,
+	GC_Red,
+	GC_Green,
+	GC_Blue,
+	GC_Orange,
+	GC_Yellow,
+    GC_Purple,
+    GC_White,
+    GC_HyperCube,
 	GC_Wild
 };
 

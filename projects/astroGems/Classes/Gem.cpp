@@ -18,7 +18,7 @@ Gem::Gem(GemColour colour, GemType type) {
 	
     this->colour = colour;
 	this->type = type;
-	this->state = GS_Idle;
+	this->state = GS_Idle;    
 }
 
 Gem::~Gem() {
@@ -52,6 +52,33 @@ void Gem::init(int x, int y, GemColour colour, GemType type) {
 		default:
 				break;
 	}
+    if(colour == GC_Orange) {
+        Sprite *cloudBack = Sprite::create("Res/temporal/gems/png/cloudBack.png");
+        
+        this->addChild(cloudBack);
+
+        cloudBack->setPosition({this->getContentSize().width / 2, this->getContentSize().height / 2});
+        cloudBack->setScale(0.6);
+
+        this->reorderChild(cloudBack, -1);
+        
+        cloudBack->runAction(RepeatForever::create(RotateBy::create(1, 30)));
+        
+        Sprite *cloudFront = Sprite::create("Res/temporal/gems/png/cloudFront.png");
+        
+        this->addChild(cloudFront);
+        
+        cloudFront->setPosition({this->getContentSize().width / 2, this->getContentSize().height / 2});
+        cloudFront->setScale(0.6);
+        
+        this->reorderChild(cloudFront, -1);
+        
+        cloudFront->runAction(RepeatForever::create(RotateBy::create(1, -30)));
+
+
+    }
+    
+    //this->setAnchorPoint({0.5, 0.5});
 }
 
 void Gem::reset(int x, int y, GemColour colour, GemType type) {
@@ -141,12 +168,12 @@ void Gem::onTransformationEnd(Object *sender) {
     string animationName = "";
     
     switch(colour) {
-		case GC_Guitar: animationName = "guitar"; break;
-		case GC_Keyboard: animationName = "keyboard"; break;
-        case GC_Microphone: animationName = "mic"; break;
-		case GC_Plectrum: animationName = "plectrum"; break;
-        case GC_Question: animationName = "mark"; break;
-		case GC_Saxophone: animationName = "sax"; break;
+		case GC_Red: animationName = "guitar"; break;
+		case GC_Green: animationName = "keyboard"; break;
+        case GC_Blue: animationName = "mic"; break;
+		case GC_Purple: animationName = "plectrum"; break;
+        case GC_Yellow: animationName = "mark"; break;
+		case GC_Orange: animationName = "sax"; break;
         case GC_Wild: animationName = "note"; break;
             
         default: CCLOG("default gem color in reset!");
@@ -267,12 +294,12 @@ void Gem::setGemColour(GemColour color) {
     string fileName = "";
 
     switch(colour) {
-		case GC_Guitar: fileName = "guitar0.png"; break;
-		case GC_Keyboard: fileName = "keyboard0.png"; break;
-        case GC_Microphone: fileName = "mic0.png"; break;
-		case GC_Plectrum: fileName = "plectrum0.png"; break;
-        case GC_Question: fileName = "mark0.png"; break;
-		case GC_Saxophone: fileName = "sax0.png"; break;
+		case GC_Red: fileName = "guitar0.png"; break;
+		case GC_Green: fileName = "keyboard0.png"; break;
+        case GC_Blue: fileName = "mic0.png"; break;
+		case GC_Purple: fileName = "plectrum0.png"; break;
+        case GC_Yellow: fileName = "mark0.png"; break;
+		case GC_Orange: fileName = "sax0.png"; break;
         case GC_Wild: fileName = "note0.png"; break;
             
         default: CCLOG("default gem color in reset!");
