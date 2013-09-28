@@ -34,7 +34,7 @@ public:
     void resetState();
 
 	void setFreeze(int power);
-	void makeBomb(GemType effect);
+	//void makeBomb(GemType effect);
 	static Point convertCoordinatesToPixels(int x, int y);
 private:
     void applyBonusStyling();

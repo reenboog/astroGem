@@ -57,7 +57,7 @@ struct Move {
 
 typedef std::list<Move> MoveList;
 
-class GemField : public Node {
+class GemField: public Node {
     
 public:
     // init
@@ -74,9 +74,16 @@ public:
 	void print();
 	void printMask();
     
+    void shuffleField(bool reset = true);
+    
     // interface to operate the field
-	void swipeAction(Point startCoordinates, int direction);
-	void clickAction(Point clickCoordinates);
+	void swipeAction(const Point &startCoordinates, int direction);
+	void clickAction(const Point &clickCoordinates);
+    
+    // helper methods for destruction
+	void destroyStraightLine(int originX, int originY, bool isHorizontal, int length = -1);
+	void destroyCross(int originX, int originY, int length = -1);
+	void destroyRect(int originX, int originY, int width, int height);
 	
 	MoveList getMoves();
 	void showTip();
@@ -106,18 +113,20 @@ private:
 	void refillLine(int lineNumber, int direction = D_Down, bool reset = true);
 	void refillField(bool reset = true);
     
+    bool areIndicesWithinField(int x, int y);
+    
 	bool areGemsBeingMoved();
     
     void visit();
 	void update(float dt);
     
 	void resetField();
-	void shuffleField(bool reset = true);
     
 	bool checkAvailableMoves();
 	MoveList getMovesForLine(int fromX, int fromY, int toX, int toY);
 	Move getGemMove(int x, int y, Direction direction);
-	void addMoveToList(Move move, MoveList &list);
+    
+	void addMoveToList(const Move &move, MoveList &list);
     
 	bool compareGemsColors(int firstX, int firstY, int secondX, int secondY);
     
@@ -134,7 +143,7 @@ private:
     
 	int columnsWithMatches;
     
-	FieldWatcherDelegatePool watchers; 
+	FieldWatcherDelegatePool watchers;
 };
 
 

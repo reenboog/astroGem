@@ -254,6 +254,10 @@ MatchList GemField::findMatchesInLine(int fromX, int fromY, int toX, int toY) {
     
 	while(x <= toX && y <= toY) {
 		while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue || (gems[y][x]->getGemColour() == GC_Wild  && chainLength >= 2) || currentValue == GC_Wild)) {
+            //
+            //while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue && currentValue != GC_Wild)) {
+            //
+            
 			x += stepX;
 			y += stepY;
 			chainLength++;
@@ -439,6 +443,10 @@ void GemField::destroyGem(int x, int y) {
 					freezeGem(y, x, freezeMask[y][x]-1);
 				}
 				if(gems[y][x]->getType() != GT_Colour) {
+                    if(gems[y][x]->getType() == GT_Explosion) {
+                        gems[y][x]->transformIntoBonus((GemType)(GT_LineHor + (GemType)CCRANDOM_0_1()));
+                    }
+                    
 					switch(gems[y][x]->getType()) {
                         case GT_Cross:
                             gems[y][x]->destroy();
@@ -475,6 +483,108 @@ void GemField::removeGem(int x, int y) {
 	}
 }
 
+void GemField::destroyStraightLine(int originX, int originY, bool isHorizontal, int length) {
+	int stepX = 1;
+	int stepY = 1;
+    
+	if(isHorizontal) {
+		stepY = 0;
+	} else {
+		stepX = 0;
+	}
+    
+	if(length == -1) {
+		length = kFieldWidth + kFieldHeight;
+	}
+    
+	int distance = 1;
+    
+	destroyGem(originX, originY);
+    
+	while(distance <= length) {
+		if(areIndicesWithinField(originX + stepX * distance, originY + stepY * distance)) {
+			destroyGem(originX + stepX * distance, originY + stepY * distance);
+		}
+		if(areIndicesWithinField(originX - stepX * distance, originY - stepY * distance)) {
+			destroyGem(originX - stepX * distance, originY - stepY * distance);
+		}
+		distance++;
+	}
+	for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
+		(*it)->onGemsStartedSwapping();
+	}
+	state = FS_Destroying;
+}
+
+void GemField::destroyCross(int originX, int originY, int length) {
+	int stepX = 1;
+	int stepY = 1;
+    
+	if(length == -1) {
+		length = kFieldWidth + kFieldHeight;
+	}
+    
+	int distance = 1;
+    
+	destroyGem(originX, originY);
+    
+	while(distance <= length) {
+		if(areIndicesWithinField(originX + stepX * distance, originY)) {
+			destroyGem(originX + stepX * distance, originY);
+		}
+		if(areIndicesWithinField(originX - stepX * distance, originY)) {
+			destroyGem(originX - stepX * distance, originY);
+		}
+		if(areIndicesWithinField(originX, originY + stepY * distance)) {
+			destroyGem(originX, originY + stepY * distance);
+		}
+		if(areIndicesWithinField(originX, originY - stepY * distance)) {
+			destroyGem(originX, originY - stepY * distance);
+		}
+		distance++;
+	}
+	for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
+		(*it)->onGemsStartedSwapping();
+	}
+	state = FS_Destroying;
+}
+
+void GemField::destroyRect(int originX, int originY, int width, int height) {
+    //	int stepX = 1;
+    //	int stepY = 1;
+    
+	int distance = 1;
+    
+    if(width == -1) {
+		width = kFieldWidth * 2;
+	}
+	if(height == -1) {
+		height = kFieldHeight * 2;
+	}
+    
+	destroyGem(originX, originY);
+    
+	while(distance <= width || distance <= height) {
+        
+		for(int y = 0; y < kFieldHeight; y++) {
+			for(int x = 0; x < kFieldWidth; x++) {
+				if(distance <= width && abs(x - originX) == distance && abs(y - originY) <= distance && abs(y - originY) <= height) {
+					destroyGem(x, y);
+				} else {
+					if (distance <= height && abs(y - originY) == distance && abs(x - originX) <= distance && abs(x - originX) <= width) {
+						destroyGem(x, y);
+					}
+				}
+			}
+		}
+		distance++;
+	}
+	for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
+		(*it)->onGemsStartedSwapping();
+	}
+	state = FS_Destroying;
+}
+
 #pragma mark - swapping stuff
 
 void GemField::swapGems(int fromX, int fromY, int toX, int toY) {
@@ -484,6 +594,11 @@ void GemField::swapGems(int fromX, int fromY, int toX, int toY) {
 	//Pointers for gems we will swap
 	first = gems[fromY][fromX];
 	second = gems[toY][toX];
+    
+    // check super swaps here
+    //if(first->getType() == something && second->getType() == something) {
+    //
+    //}
     
 	swapGemsIndices(fromX, fromY, toX, toY);
     
@@ -530,7 +645,7 @@ void GemField::deselectGem(int x, int y) {
 
 #pragma mark - public API for players
 
-void GemField::swipeAction(Point startCoordinates, int direction) {
+void GemField::swipeAction(const Point &startCoordinates, int direction) {
 	int fromX = startCoordinates.x;
 	int fromY = startCoordinates.y;
 	
@@ -574,7 +689,7 @@ void GemField::swipeAction(Point startCoordinates, int direction) {
 	}
 }
 
-void GemField::clickAction(Point clickCoordinates) {
+void GemField::clickAction(const Point &clickCoordinates) {
 	int toX = clickCoordinates.x;
 	int toY = clickCoordinates.y;
 	if(toX >= 0 && toX < kFieldWidth && toY >= 0 && toY < kFieldHeight) {
@@ -840,8 +955,10 @@ void GemField::moveGem(int fromX, int fromY, int toX, int toY, int rowsToWait) {
 void GemField::resetGemsState() {
 	for(int y = 0; y < kFieldHeight; y++) {
 		for(int x = 0; x < kFieldWidth; x++) {
-			if(gems[y][x]->getState() != GS_Destroyed) {
-				gems[y][x]->resetState();
+			if(fieldMask[y][x] == 1) {
+				if(gems[y][x]->getState() != GS_Destroyed) {
+					gems[y][x]->resetState();
+				}
 			}
 		}
 	}
@@ -862,6 +979,9 @@ bool GemField::compareGemsColors(int firstX, int firstY, int secondX, int second
 	return false;
 }
 
+bool GemField::areIndicesWithinField(int x, int y) {
+	return x >= 0 && x < kFieldWidth && y >= 0 && y < kFieldHeight;
+}
 
 #pragma mark - moves & hints
 
@@ -911,12 +1031,17 @@ MoveList GemField::getMovesForLine(int fromX, int fromY, int toX, int toY) {
     
     
 	while(x <= toX + 1 && y <= toY + 1) {
-		while ((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue || (gems[y][x]->getGemColour() == GC_Wild  && chainLength >= 2) || currentValue == GC_Wild))
-		{
+		while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue || (gems[y][x]->getGemColour() == GC_Wild  && chainLength >= 2) || currentValue == GC_Wild)) {
 			x += stepX;
 			y += stepY;
 			chainLength++;
 		}
+//      while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue || (gems[y][x]->getGemColour() == GC_Note  &&
+//          chainLength >= 2) || currentValue == GC_Note)) {
+//			x += stepX;
+//			y += stepY;
+//			chainLength++;
+//		}
 		//CCLOG("Stopped at %i,%i with length %i", x, y, chainLength);
 		
         
@@ -976,8 +1101,7 @@ MoveList GemField::getMovesForLine(int fromX, int fromY, int toX, int toY) {
 			return  availableMoves;
 		}
         
-		while(fieldMask[y][x] == 0)
-		{
+		while(fieldMask[y][x] == 0) {
 			x += stepX;
 			y += stepY;
 		}
@@ -1022,7 +1146,7 @@ Move GemField::getGemMove(int x, int y, Direction direction) {
 	return Move();
 }
 
-void GemField::addMoveToList(Move move, MoveList &list) {
+void GemField::addMoveToList(const Move &move, MoveList &list) {
 	if(move.legal) {
 		list.push_front(move);
 	}
