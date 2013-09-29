@@ -4,14 +4,18 @@
 #define kFieldWidth 8
 #define kFieldHeight 8
 
-#define kGemTypeAmount 6
+#define kGemTypeAmount 7
 
 #define kTileSize 80.0f
 #define kSwapTime 0.1f
 #define kFallTime 0.1f
-#define kDestructionTime 0.1f
+#define kDestructionTime 0.205f
+
+#define kRectBombDestructionSize 1
 
 #define kBonusChance 0.0f
+
+#define kGemCloudSpritesTag 1000
 
 #define kZOrderGem 2
 #define kZOrderTile 3
@@ -28,7 +32,7 @@
 
 #define kSpawnBonuses 1
 
-const bool kPreloadField = false;
+const bool kPreloadField = true;
 
 enum GemColour {
 	GC_Random,
@@ -39,8 +43,7 @@ enum GemColour {
 	GC_Yellow,
     GC_Purple,
     GC_White,
-    GC_HyperCube,
-	GC_Wild
+    GC_Hypercube
 };
 
 enum GemState {
@@ -61,8 +64,10 @@ enum GemType {
 	GT_Cross,
 	GT_LineHor,
 	GT_LineVer,
+    GT_LineDestroyer,
+    GT_RectDestroyer,
 	GT_Explosion,
-    GT_WildMaker
+    GT_HypercubeMaker,
 };
 
 enum Direction {
@@ -90,10 +95,10 @@ enum FieldState {
 };
 
 #if(kSpawnBonuses == 1)
-    const GemType kVerticalMatchFourBonus = GT_Explosion;
-    const GemType kHorizontalMatchFourBonus = GT_Explosion;
-    const GemType kVerticalMatchFiveBonus = GT_WildMaker;
-    const GemType kHorizontalMatchFiveBonus = GT_WildMaker;
+    const GemType kVerticalMatchFourBonus = GT_LineDestroyer;
+    const GemType kHorizontalMatchFourBonus = GT_LineDestroyer;
+    const GemType kVerticalMatchFiveBonus = GT_HypercubeMaker;
+    const GemType kHorizontalMatchFiveBonus = GT_HypercubeMaker;
     const GemType kCrossMatchBonus = GT_Cross;
 #else
     const GemType kVerticalMatchFourBonus = GT_Colour;

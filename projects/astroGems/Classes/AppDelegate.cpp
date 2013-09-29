@@ -28,7 +28,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     
     FileUtils::getInstance()->addSearchPath("Res/1136x640");
     FileUtils::getInstance()->addSearchPath("Res/shared");
-    FileUtils::getInstance()->addSearchPath("Res/");
+    FileUtils::getInstance()->addSearchPath("Res");
     
     // load game config
     GameConfig::sharedInstance()->load();

@@ -42,43 +42,16 @@ void Gem::init(int x, int y, GemColour colour, GemType type) {
 	setPosition(convertCoordinatesToPixels(x,y));
 	setZOrder(zOrder);
 
-	switch(type) {
-		case GT_Cross: setOpacity(125);
-				break;
-		case GT_LineHor: setFlipY(true);
-				break;
-		case GT_LineVer: setFlipX(true);
-				break;
-		default:
-				break;
-	}
-    if(colour == GC_Orange) {
-        Sprite *cloudBack = Sprite::create("Res/temporal/gems/png/cloudBack.png");
-        
-        this->addChild(cloudBack);
-
-        cloudBack->setPosition({this->getContentSize().width / 2, this->getContentSize().height / 2});
-        cloudBack->setScale(0.6);
-
-        this->reorderChild(cloudBack, -1);
-        
-        cloudBack->runAction(RepeatForever::create(RotateBy::create(1, 30)));
-        
-        Sprite *cloudFront = Sprite::create("Res/temporal/gems/png/cloudFront.png");
-        
-        this->addChild(cloudFront);
-        
-        cloudFront->setPosition({this->getContentSize().width / 2, this->getContentSize().height / 2});
-        cloudFront->setScale(0.6);
-        
-        this->reorderChild(cloudFront, -1);
-        
-        cloudFront->runAction(RepeatForever::create(RotateBy::create(1, -30)));
-
-
-    }
-    
-    //this->setAnchorPoint({0.5, 0.5});
+//	switch(type) {
+//		case GT_Cross: setOpacity(125);
+//				break;
+//		case GT_LineHor: setFlipY(true);
+//				break;
+//		case GT_LineVer: setFlipX(true);
+//				break;
+//		default:
+//				break;
+//	}
 }
 
 void Gem::reset(int x, int y, GemColour colour, GemType type) {
@@ -99,19 +72,20 @@ void Gem::reset(int x, int y, GemColour colour, GemType type) {
     setFlipX(false);
     setFlipY(false);
     setScale(1.0);
+    setRotation(0);
     setOpacity(255);
     
     // Add bonus styling
-    switch(type) {
-        case GT_Cross: setOpacity(125);
-            break;
-        case GT_LineHor: setFlipY(true);
-            break;
-        case GT_LineVer: setFlipX(true);
-            break;
-        default:
-            break;
-    }
+//    switch(type) {
+//        case GT_Cross: setOpacity(125);
+//            break;
+//        case GT_LineHor: setFlipY(true);
+//            break;
+//        case GT_LineVer: setFlipX(true);
+//            break;
+//        default:
+//            break;
+//    }
 }
 
 #pragma mark - bonuses
@@ -124,26 +98,38 @@ void Gem::transformIntoBonus(GemType type) {
 		//applyBonusStyling();
         
 		Action *enlarge = ScaleTo::create(kTransformationTime / 3.f, 1.5f);
-		Action *restyle;
+		Action *restyle = nullptr;
         
 		switch(type) {
-//			case GT_Cross:
-//				restyle = FadeTo::create(kTransformationTime / 3.f, 125);
+			case GT_Cross:
+				restyle = FadeTo::create(kTransformationTime / 3.f, 125);
+				break;
+            case GT_HypercubeMaker:
+                setGemColour(GC_Hypercube);
+                
+                restyle = Sequence::create(ScaleTo::create(kTransformationTime / 6.f, 1, 0),
+                                           RotateTo::create(0.2, 40),
+                                           ScaleTo::create(kTransformationTime / 6.f, 1, 1),
+                                           NULL);
+                break;
+			case GT_LineDestroyer:
+				restyle = Sequence::create(ScaleTo::create(kTransformationTime / 6.f, 1, 0),
+                                           RotateTo::create(0.2, 40),
+                                           ScaleTo::create(kTransformationTime / 6.f, 1, 1),
+                                           NULL);
+				break;
+//            case GT_LineHor:
+//				restyle = Sequence::create(ScaleTo::create(kTransformationTime / 6.f, 1, 0),
+//                                           FlipY::create(true),
+//                                           ScaleTo::create(kTransformationTime / 6.f, 1, 1),
+//                                           NULL);
 //				break;
-            case GT_WildMaker:
-                setGemColour(GC_Wild);
-			case GT_LineHor:
-				//restyle = Sequence::create(ScaleTo::create(kTransformationTime / 6.f, 1, 0),
-                //                           //FlipY::create(true),
-                //                           ScaleTo::create(kTransformationTime / 6.f, 1, 1),
-                //                           NULL);
-				break;
-			case GT_LineVer:
-				//restyle = Sequence::create(ScaleTo::create(kTransformationTime / 6.f, 0, 1),
-                                           //FlipX::create(true),
-                //                           ScaleTo::create(kTransformationTime / 6.f, 1, 1),
-                //                           NULL);
-				break;
+//			case GT_LineVer:
+//				restyle = Sequence::create(ScaleTo::create(kTransformationTime / 6.f, 0, 1),
+//                                           FlipX::create(true),
+//                                           ScaleTo::create(kTransformationTime / 6.f, 1, 1),
+//                                           NULL);
+//				break;
 			default:
 				restyle = DelayTime::create(kTransformationTime / 3.f);
 				break;
@@ -151,9 +137,9 @@ void Gem::transformIntoBonus(GemType type) {
         
 		Action *shrink = ScaleTo::create(kTransformationTime / 3.f, 1);
 		Action *endTransformation = CallFuncN::create(CC_CALLBACK_1(Gem::onTransformationEnd, this));
-		Action *destruction = Sequence::create(//(FiniteTimeAction*) enlarge,
-                                               //(FiniteTimeAction*) restyle,
-                                               //(FiniteTimeAction*) shrink,
+		Action *destruction = Sequence::create((FiniteTimeAction*) enlarge,
+                                               (FiniteTimeAction*) restyle,
+                                               (FiniteTimeAction*) shrink,
                                                (FiniteTimeAction*) endTransformation,
                                                NULL);
         runAction(destruction);
@@ -174,13 +160,13 @@ void Gem::onTransformationEnd(Object *sender) {
 		case GC_Purple: animationName = "plectrum"; break;
         case GC_Yellow: animationName = "mark"; break;
 		case GC_Orange: animationName = "sax"; break;
-        case GC_Wild: animationName = "note"; break;
+        //case GC_Wild: animationName = "note"; break;
             
         default: CCLOG("default gem color in reset!");
 	}
     
-    Animate *action = Animate::create(AnimationCache::getInstance()->animationByName(animationName.c_str()));
-    runAction(RepeatForever::create(action));
+    //Animate *action = Animate::create(AnimationCache::getInstance()->animationByName(animationName.c_str()));
+    //runAction(RepeatForever::create(action));
 }
 
 void Gem::applyBonusStyling() {
@@ -205,7 +191,7 @@ void Gem::onMovementEnd(Object *sender) {
 
 void Gem::select() {
 	state = GS_Selected;
-	//setScale(1.2f);
+	setScale(1.2f);
 }
 
 void Gem::deselect() {
@@ -263,7 +249,7 @@ void Gem::moveTo(int x, int y, float time, bool goBack, int blocksToWait, int ro
 void Gem::match(MatchType matchType) {
 	state = GS_Matched;
     
-    if(type == GT_Explosion && matchType != MT_None) {
+    if(type == GT_LineDestroyer && matchType != MT_None) {
         switch(matchType) {
             case MT_Vertical:
                 type = GT_LineVer; break;
@@ -289,25 +275,30 @@ GemColour Gem::getGemColour() {
 }
 
 void Gem::setGemColour(GemColour color) {
-    this->colour = color;
-
     string fileName = "";
 
-    switch(colour) {
-		case GC_Red: fileName = "guitar0.png"; break;
-		case GC_Green: fileName = "keyboard0.png"; break;
-        case GC_Blue: fileName = "mic0.png"; break;
-		case GC_Purple: fileName = "plectrum0.png"; break;
-        case GC_Yellow: fileName = "mark0.png"; break;
-		case GC_Orange: fileName = "sax0.png"; break;
-        case GC_Wild: fileName = "note0.png"; break;
+    switch(color) {
+		case GC_Red: fileName = "red.png"; break;;
+		case GC_Green: fileName = "green.png"; break;
+        case GC_Blue: fileName = "blue.png"; break;
+		case GC_Purple: fileName = "purple.png"; break;
+        case GC_Yellow: fileName = "yellow.png"; break;
+		case GC_Orange: fileName = "orange.png"; break;
+        case GC_White: fileName = "white.png"; break;
+        case GC_Hypercube: fileName = "hyperCube.png"; break;
+        //case GC_Wild: fileName = "rainbow.png"; break;
             
         default: CCLOG("default gem color in reset!");
 	}
+    
     if(getTexture() == nullptr) {
         initWithSpriteFrameName(fileName.c_str());
     } else {
         setDisplayFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(fileName.c_str()));
+    }
+    
+    if(color != GC_Hypercube) {
+        this->colour = color;
     }
 }
 
@@ -335,21 +326,30 @@ void Gem::destroy() {
 		runAction(destruction);
         
         if(this->getParent()) {
-            // apply destruction particle effect
-            Sprite *noteFog = Sprite::createWithSpriteFrameName("gemDeath0.png");
-            noteFog->setPosition(this->getPosition());
+//            // apply destruction particle effect
+            LabelTTF *label = LabelTTF::create("+30", "Trebuchet", 36);
+            label->setPosition(this->getPosition());
+            label->setOpacity(0);
+            label->setScale(0.5);
             
-            Animate *destructionAnim = Animate::create(AnimationCache::getInstance()->animationByName("gemDeath"));
+            FiniteTimeAction *destructionAnim = nullptr;
+            
+            destructionAnim = Sequence::create(Spawn::create(ScaleTo::create(0.2, 1.0f),
+                                                             FadeIn::create(0.33),
+                                                             MoveBy::create(0.5, {0, 100}),
+                                                             NULL),
+                                               Spawn::create(FadeOut::create(0.14),
+                                                             ScaleTo::create(0.24, 0.5), NULL), NULL);
             
             auto cleanFogUp = CallFunc::create([=](){
-                noteFog->removeFromParent();
+                label->removeFromParent();
             });
             
-            noteFog->runAction(Sequence::create(destructionAnim, cleanFogUp, NULL));
+            label->runAction(Sequence::create(destructionAnim, cleanFogUp, NULL));
 
             // we're definetly sure that the gem has a parent
             Node *parent = this->getParent();
-            parent->addChild(noteFog, this->getZOrder());
+            parent->addChild(label, this->getZOrder());
         }
 	}
 }

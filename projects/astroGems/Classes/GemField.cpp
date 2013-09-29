@@ -97,89 +97,24 @@ bool GemField::init() {
 	}
     
     state = FS_Ready;
-    
-	// Test specific loadouts here
-    
-	/*
-     // Field with no matches (and no turns)
-     {2,3,4,2,3,4,2,3,4},
-     {3,4,2,3,4,2,3,4,2},
-     {4,2,3,4,2,3,4,2,3},
-     {2,3,4,2,3,4,2,3,4},
-     {3,4,2,3,4,2,3,4,2},
-     {4,2,3,4,2,3,4,2,3}
-     
-     // Square of doom
-     {2,3,4,2,3,4,2,3,4},
-     {3,4,2,3,4,2,3,4,2},
-     {4,2,3,1,1,1,4,2,3},
-     {2,3,4,1,1,1,2,3,4},
-     {3,4,2,1,1,1,3,4,2},
-     {4,2,3,4,2,3,4,2,3}
-     
-     // Cross that is also a match 5
-     {2,3,4,2,3,4,2,3,4},
-     {3,4,2,1,4,2,3,4,2},
-     {4,1,1,4,1,1,4,2,3},
-     {2,3,4,1,3,4,2,3,4},
-     {3,4,2,1,4,2,3,4,2},
-     {4,2,3,4,2,3,4,2,3}
-     
-     // A tricky situation
-     {2,3,4,2,1,4,2,3,4},
-     {3,4,2,3,5,2,3,4,2},
-     {4,1,1,4,5,3,4,2,3},
-     {5,5,5,1,5,1,1,3,4},
-     {3,4,2,3,1,2,3,4,2},
-     {4,2,3,4,1,3,4,2,3}
-     
-     // Match 4 by bonus
-     {2,3,4,2,3,4,2,3,4},
-     {3,4,2,3,4,2,3,4,2},
-     {4,1,1,4,1,3,4,2,3},
-     {2,3,4,1,3,4,2,3,4},
-     {3,4,2,3,4,2,3,4,2},
-     {4,2,3,4,2,3,4,2,3}
-     
-     {0,0,0,0,0,0,0,0,0},
-     {0,0,0,0,0,0,0,0,0},
-     {0,0,0,0,0,0,0,0,0},
-     {0,0,0,1,0,0,0,0,0},
-     {0,0,0,0,0,0,0,0,0},
-     {0,0,0,0,0,0,0,0,0}
-     
-     // Match 4 which has a bonus
-     {2,3,4,2,3,4,2,3,4},
-     {3,4,2,3,4,2,3,4,2},
-     {4,1,1,4,1,3,4,2,3},
-     {2,3,4,1,3,4,2,3,4},
-     {3,4,2,3,4,2,3,4,2},
-     {4,2,3,4,2,3,4,2,3}
-     
-     {0,0,0,0,0,0,0,0,0},
-     {0,0,0,0,0,0,0,0,0},
-     {0,0,1,0,0,0,0,0,0},
-     {0,0,0,0,0,0,0,0,0},
-     {0,0,0,0,0,0,0,0,0},
-     {0,0,0,0,0,0,0,0,0}
-     */
+ 
 	if(kPreloadField) {
 		const int customField[kFieldHeight][kFieldWidth] = {
 			{2,3,4,2,1,4,2,3},
 			{3,4,2,3,5,2,3,2},
 			{4,1,1,4,5,3,2,3},
-			{5,5,5,1,5,2,3,4},
-			{3,4,2,3,2,3,4,2},
-			{4,2,3,1,3,4,2,3},
-            {4,2,3,1,3,4,2,3},
-            {4,2,3,1,3,4,2,3}
+			{5,5,1,1,5,2,3,4},
+			{3,4,3,3,2,3,4,2},
+			{1,2,1,3,2,1,2,3},
+            {2,1,3,1,3,4,1,1},
+            {4,2,3,2,3,4,2,3}
 		};
         
 		const int customFieldType[kFieldHeight][kFieldWidth] = {
+			{0,0,4,0,0,0,0,4},
 			{0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,4,0},
 			{0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0},
             {0,0,0,0,0,0,0,0},
@@ -253,7 +188,7 @@ MatchList GemField::findMatchesInLine(int fromX, int fromY, int toX, int toY) {
 	y += stepY;
     
 	while(x <= toX && y <= toY) {
-		while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue || (gems[y][x]->getGemColour() == GC_Wild  && chainLength >= 2) || currentValue == GC_Wild)) {
+		while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue) && currentValue != GC_Hypercube) {
             //
             //while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue && currentValue != GC_Wild)) {
             //
@@ -383,15 +318,13 @@ void GemField::resolveMatch(const Match &match) {
 				}
 			}
 		} else {
-            // If we come arcoss a gem that is already matched or turninig into a bonus
-			// Transform into bonus for cross
-            //			if(gems[y][x]->getType() != GT_Colour) {
-            //				createBonusNext = true;
-            //				gems[y][x]->match();
-            //			} else {
-            //				gems[y][x]->transformIntoBonus(kCrossMatchBonus);
-            //				bonusWasAdded = true;
-            //			}
+            if(gems[y][x]->getType() != GT_Colour) {
+                createBonusNext = true;
+                gems[y][x]->match();
+            } else {
+                gems[y][x]->transformIntoBonus(kCrossMatchBonus);
+                bonusWasAdded = true;
+            }
 		}
 		y += stepY;
 		x += stepX;
@@ -436,13 +369,13 @@ void GemField::destroyGem(int x, int y) {
 	if(fieldMask[y][x] == 1) {
 		if(gems[y][x]->getState() != GS_Destroying) {
 			if(freezeMask[y][x] > 1) {
-				freezeGem(y, x, freezeMask[y][x]-1);
+				freezeGem(y, x, freezeMask[y][x] - 1);
 			} else {
 				if(freezeMask[y][x] == 1) {
 					freezeGem(y, x, freezeMask[y][x]-1);
 				}
 				if(gems[y][x]->getType() != GT_Colour) {
-                    if(gems[y][x]->getType() == GT_Explosion) {
+                    if(gems[y][x]->getType() == GT_LineDestroyer) {
                         gems[y][x]->transformIntoBonus((GemType)(GT_LineHor + (GemType)CCRANDOM_0_1()));
                     }
                     
@@ -452,13 +385,17 @@ void GemField::destroyGem(int x, int y) {
                             destroyLine(x, 0, x, kFieldHeight - 1);
                             destroyLine(0, y, kFieldWidth - 1, y);
                             break;
-                        case GT_LineHor :
+                        case GT_LineHor:
                             gems[y][x]->destroy();
                             destroyLine(0, y, kFieldWidth - 1, y);
                             break;
-                        case GT_LineVer :
+                        case GT_LineVer:
                             gems[y][x]->destroy();
                             destroyLine(x, 0, x, kFieldHeight - 1);
+                            break;
+                        case GT_RectDestroyer:
+                            gems[y][x]->destroy();
+                            destroyRect(x, y, kRectBombDestructionSize, kRectBombDestructionSize);
                             break;
                         default:
                             gems[y][x]->destroy();
@@ -738,7 +675,7 @@ void GemField::visit() {
     
     y = abs(pos.y - kTileSize * kFieldHeight / 4);
     
-    glScissor(x, y, visibleSize.width, kTileSize * (kFieldHeight + 2.2));
+    glScissor(x, y, visibleSize.width, kTileSize * (kFieldHeight + 2));
     
     Node::visit();
     
@@ -1030,7 +967,7 @@ MoveList GemField::getMovesForLine(int fromX, int fromY, int toX, int toY) {
     
     
 	while(x <= toX + 1 && y <= toY + 1) {
-		while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue || (gems[y][x]->getGemColour() == GC_Wild  && chainLength >= 2) || currentValue == GC_Wild)) {
+		while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue) && currentValue != GC_Hypercube) {
 			x += stepX;
 			y += stepY;
 			chainLength++;

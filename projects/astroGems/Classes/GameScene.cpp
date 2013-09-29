@@ -29,43 +29,39 @@ bool GameScene::init() {
     }
     
     // add sprite sheets
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gemGuitar.plist");
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gemKeyboard.plist");
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gemMark.plist");
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gemMic.plist");
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gemPlectrum.plist");
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gemSax.plist");
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gemNote.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gems.plist");
 
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gemDeath.plist");
+//    Shared::loadAnimation("animations.plist", "guitar");
+//    Shared::loadAnimation("animations.plist", "keyboard");
+//    Shared::loadAnimation("animations.plist", "mark");
+//    Shared::loadAnimation("animations.plist", "mic");
+//    Shared::loadAnimation("animations.plist", "plectrum");
+//    Shared::loadAnimation("animations.plist", "sax");
+//    Shared::loadAnimation("animations.plist", "note");
 
-    Shared::loadAnimation("animations.plist", "guitar");
-    Shared::loadAnimation("animations.plist", "keyboard");
-    Shared::loadAnimation("animations.plist", "mark");
-    Shared::loadAnimation("animations.plist", "mic");
-    Shared::loadAnimation("animations.plist", "plectrum");
-    Shared::loadAnimation("animations.plist", "sax");
-    Shared::loadAnimation("animations.plist", "note");
-
-    Shared::loadAnimation("animations.plist", "gemDeath");
+//    Shared::loadAnimation("animations.plist", "gemDeath");
     //
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Point origin = Director::getInstance()->getVisibleOrigin();
 
-    back = Sprite::create("backgrounds/bgr00.jpg");
+    back = Sprite::create("backgrounds/bgr04.jpg");
     back->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 
     this->addChild(back, 0);
+    
+    Sprite *grid = Sprite::create("temporal/gems/png/grid.png");
+    grid->setPosition({visibleSize.width / 2, visibleSize.height / 2});
+    this->addChild(grid);
     
     field = GemField::create();
     field->addWatcher(this);
     
     this->addChild(field);
     
-	float posX = (visibleSize.width - kTileSize * (kFieldWidth)) / 2;
-	float posY = (visibleSize.height - kTileSize * (kFieldHeight)) / 2 - 31;
-	
+    float posX = (visibleSize.width - kTileSize * (kFieldWidth)) / 2;
+	float posY = (visibleSize.height - kTileSize * (kFieldHeight)) / 2;
+    
     field->setPosition(posX, posY);
     
     // prepare for touches
