@@ -7,8 +7,8 @@
 
 class FieldWatcherDelegate {
 public:
-	virtual void onGemsMatched(int length, GemColour colour) = 0;
-	virtual void onGemDestroyed(GemColour colour) = 0;
+	virtual void onGemsMatched(int length, GemColour colour, int startX, int startY, int endX, int endY, int score) = 0;
+	virtual void onGemDestroyed(GemColour colour, int x, int y, int score) = 0;
 	virtual void onGemsToBeShuffled() = 0;
 	virtual void onGemsStartedSwapping() = 0;
 	virtual void onGemsFinishedMoving() = 0;

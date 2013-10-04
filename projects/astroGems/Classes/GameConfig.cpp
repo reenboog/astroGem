@@ -32,6 +32,10 @@ void GameConfig::load() {
     gameTimer = kgameTimer;
     quizTimer = kQuizTimer;
     qMultiplier = kQMultiplier;
+    
+    baseIconValue = kBaseIconValue;
+    fourInRowIconValue = kFourInRowIconValue;
+    noteIconValue = kNoteIconValue;
 }
 
 void GameConfig::save() {

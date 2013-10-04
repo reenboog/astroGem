@@ -17,10 +17,11 @@
 
 #define kGemCloudSpritesTag 1000
 
-#define kZOrderGem 2
-#define kZOrderTile 3
+#define zGem 2
+#define zTile 3
+#define zLighting 90
+#define zMatchScore 100
 
-#define kAITurnDelay 0.5f
 #define kTipDelay 1.f
 
 #define kTransformationTime 0.3f
@@ -56,6 +57,11 @@ enum GemState {
 	GS_Transformed,
 	GS_Destroying,
 	GS_Destroyed,
+    GS_AboutToDestroyByNote,
+    GS_AboutToExplodeByNote,
+    GS_ExplodingByNote,
+    GS_AboutToTurnIntoBomb,
+    GS_AboutToExplodeWithCross,
 	GS_Immovable
 };
 
@@ -67,7 +73,7 @@ enum GemType {
     GT_LineDestroyer,
     GT_RectDestroyer,
 	GT_Explosion,
-    GT_HypercubeMaker,
+    GT_Hypercube,
 };
 
 enum Direction {
@@ -92,13 +98,19 @@ enum FieldState {
 	FS_Destroying,
 	FS_Refilling,
 	FS_Shuffling,
+    FS_SwappingHypercubeWithNormalIcon,
+    FS_DestroyingNormalIconsAfterSwipe,
+    FS_SwappingTwoFourInRowIcons,
+    FS_SwappingHypercubeWithFourInRowIcon,
+    FS_TurningGemsToFourInRowIcons,
+    FS_DestroyingFourInRowIcons,
 };
 
 #if(kSpawnBonuses == 1)
     const GemType kVerticalMatchFourBonus = GT_LineDestroyer;
     const GemType kHorizontalMatchFourBonus = GT_LineDestroyer;
-    const GemType kVerticalMatchFiveBonus = GT_HypercubeMaker;
-    const GemType kHorizontalMatchFiveBonus = GT_HypercubeMaker;
+    const GemType kVerticalMatchFiveBonus = GT_Hypercube;
+    const GemType kHorizontalMatchFiveBonus = GT_Hypercube;
     const GemType kCrossMatchBonus = GT_Cross;
 #else
     const GemType kVerticalMatchFourBonus = GT_Colour;

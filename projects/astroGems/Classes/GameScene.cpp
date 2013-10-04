@@ -31,13 +31,6 @@ bool GameScene::init() {
     // add sprite sheets
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gems.plist");
 
-//    Shared::loadAnimation("animations.plist", "guitar");
-//    Shared::loadAnimation("animations.plist", "keyboard");
-//    Shared::loadAnimation("animations.plist", "mark");
-//    Shared::loadAnimation("animations.plist", "mic");
-//    Shared::loadAnimation("animations.plist", "plectrum");
-//    Shared::loadAnimation("animations.plist", "sax");
-//    Shared::loadAnimation("animations.plist", "note");
 
 //    Shared::loadAnimation("animations.plist", "gemDeath");
     //
@@ -77,11 +70,11 @@ bool GameScene::init() {
 
 #pragma mark - field watcher delegate
 
-void GameScene::onGemDestroyed(GemColour colour) {
+void GameScene::onGemDestroyed(GemColour colour, int x, int y, int score) {
 	// get is destroyed
 }
 
-void GameScene::onGemsMatched(int length, GemColour colour) {
+void GameScene::onGemsMatched(int length, GemColour colour, int startX, int startY, int endX, int endY, int score) {
 	// on match
 }
 
@@ -162,4 +155,9 @@ void GameScene::ccTouchEnded(Touch *touch, Event *event) {
 
 Point GameScene::convertLocationToFieldCoordinates(Point point) {
 	return Point((int) ((point.x - field->getPositionX()) / kTileSize), (int) (kFieldHeight - (point.y - field->getPositionY()) / kTileSize));
+}
+
+Point GameScene::convertFieldCoordinatesToWorldLocation(const Point &point) {
+    return Point(point.x * kTileSize + field->getPositionX() + kTileSize / 2.0,
+                 (kFieldHeight - point.y) * kTileSize + field->getPositionY() - kTileSize / 2.0);
 }

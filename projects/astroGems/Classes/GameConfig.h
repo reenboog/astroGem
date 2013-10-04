@@ -9,10 +9,18 @@
 #ifndef ___pGigTickets__GameConfig__
 #define ___pGigTickets__GameConfig__
 
+#include "cocos2d.h"
+
+USING_NS_CC;
+
 #define kAppVersion         1
 #define kgameTimer          180
 #define kQuizTimer          5
 #define kQMultiplier        5
+
+#define kBaseIconValue      50
+#define kFourInRowIconValue 500
+#define kNoteIconValue      100
 
 class GameConfig {
 private:
@@ -32,6 +40,10 @@ public:
     float gameTimer;
     float quizTimer;
     float qMultiplier;
+    
+    float baseIconValue;
+    float fourInRowIconValue;
+    float noteIconValue;
 };
 
 #endif /* defined(___pGigTickets__GameConfig__) */
