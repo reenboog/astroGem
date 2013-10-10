@@ -14,7 +14,7 @@
 USING_NS_CC;
 
 #define kAppVersion         1
-#define kgameTimer          180
+#define kGameTimer          60
 #define kQuizTimer          5
 #define kQMultiplier        5
 
@@ -44,6 +44,9 @@ public:
     float baseIconValue;
     float fourInRowIconValue;
     float noteIconValue;
+    
+    // required to align ui
+    Point gridPos;
 };
 
 #endif /* defined(___pGigTickets__GameConfig__) */

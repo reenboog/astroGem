@@ -34,6 +34,7 @@
 		B8279E1917F3F63800AD8B7C /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = B8279E1217F3F63800AD8B7C /* Icon-72.png */; };
 		B8279E1A17F3F63800AD8B7C /* Icon-114.png in Resources */ = {isa = PBXBuildFile; fileRef = B8279E1317F3F63800AD8B7C /* Icon-114.png */; };
 		B8279E1B17F3F63800AD8B7C /* Icon-144.png in Resources */ = {isa = PBXBuildFile; fileRef = B8279E1417F3F63800AD8B7C /* Icon-144.png */; };
+		B8F42666180584E900AF20A7 /* GameUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F42664180584E900AF20A7 /* GameUI.cpp */; };
 		BF171245129291EC00B8313A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB012928DE900B8313A /* OpenGLES.framework */; };
 		BF1712471292920000B8313A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB412928DE900B8313A /* libz.dylib */; };
 		BF1C47F01293687400B63C5D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1C47EA1293683800B63C5D /* QuartzCore.framework */; };
@@ -214,6 +215,8 @@
 		B8279E1217F3F63800AD8B7C /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = SOURCE_ROOT; };
 		B8279E1317F3F63800AD8B7C /* Icon-114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-114.png"; sourceTree = SOURCE_ROOT; };
 		B8279E1417F3F63800AD8B7C /* Icon-144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-144.png"; sourceTree = SOURCE_ROOT; };
+		B8F42664180584E900AF20A7 /* GameUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameUI.cpp; path = ../Classes/GameUI.cpp; sourceTree = "<group>"; };
+		B8F42665180584E900AF20A7 /* GameUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameUI.h; path = ../Classes/GameUI.h; sourceTree = "<group>"; };
 		BF170DB012928DE900B8313A /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		BF170DB412928DE900B8313A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		BF1C47EA1293683800B63C5D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -267,20 +270,10 @@
 		15AA9C4015B7EC450033D6C2 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				1AFAF8B316D35DE700DB1158 /* AppDelegate.cpp */,
-				1AFAF8B416D35DE700DB1158 /* AppDelegate.h */,
-				B8279DED17F3F4F500AD8B7C /* Constants.h */,
-				B8279DEE17F3F4F500AD8B7C /* FieldWatcherDelegate.h */,
-				B8279DEF17F3F4F500AD8B7C /* GameConfig.cpp */,
-				B8279DF017F3F4F500AD8B7C /* GameConfig.h */,
-				B8279DF117F3F4F500AD8B7C /* GameScene.cpp */,
-				B8279DF217F3F4F500AD8B7C /* GameScene.h */,
-				B8279DF317F3F4F500AD8B7C /* Gem.cpp */,
-				B8279DF417F3F4F500AD8B7C /* Gem.h */,
-				B8279DF517F3F4F600AD8B7C /* GemField.cpp */,
-				B8279DF617F3F4F600AD8B7C /* GemField.h */,
-				B8279DFB17F3F4FD00AD8B7C /* Shared.cpp */,
-				B8279DFC17F3F4FD00AD8B7C /* Shared.h */,
+				B8F4267518059CD800AF20A7 /* app */,
+				B8F4267418059CCA00AF20A7 /* config&constants */,
+				B8F4267618059CE200AF20A7 /* scenes */,
+				B8F4267318059CC000AF20A7 /* field */,
 				B8279DFE17F3F50300AD8B7C /* rapidjson */,
 			);
 			name = Classes;
@@ -360,6 +353,50 @@
 			);
 			name = Resources;
 			path = ../Resources;
+			sourceTree = "<group>";
+		};
+		B8F4267318059CC000AF20A7 /* field */ = {
+			isa = PBXGroup;
+			children = (
+				B8279DEE17F3F4F500AD8B7C /* FieldWatcherDelegate.h */,
+				B8279DF317F3F4F500AD8B7C /* Gem.cpp */,
+				B8279DF417F3F4F500AD8B7C /* Gem.h */,
+				B8279DF517F3F4F600AD8B7C /* GemField.cpp */,
+				B8279DF617F3F4F600AD8B7C /* GemField.h */,
+			);
+			name = field;
+			sourceTree = "<group>";
+		};
+		B8F4267418059CCA00AF20A7 /* config&constants */ = {
+			isa = PBXGroup;
+			children = (
+				B8279DED17F3F4F500AD8B7C /* Constants.h */,
+				B8279DEF17F3F4F500AD8B7C /* GameConfig.cpp */,
+				B8279DF017F3F4F500AD8B7C /* GameConfig.h */,
+				B8279DFB17F3F4FD00AD8B7C /* Shared.cpp */,
+				B8279DFC17F3F4FD00AD8B7C /* Shared.h */,
+			);
+			name = "config&constants";
+			sourceTree = "<group>";
+		};
+		B8F4267518059CD800AF20A7 /* app */ = {
+			isa = PBXGroup;
+			children = (
+				1AFAF8B316D35DE700DB1158 /* AppDelegate.cpp */,
+				1AFAF8B416D35DE700DB1158 /* AppDelegate.h */,
+			);
+			name = app;
+			sourceTree = "<group>";
+		};
+		B8F4267618059CE200AF20A7 /* scenes */ = {
+			isa = PBXGroup;
+			children = (
+				B8279DF117F3F4F500AD8B7C /* GameScene.cpp */,
+				B8279DF217F3F4F500AD8B7C /* GameScene.h */,
+				B8F42664180584E900AF20A7 /* GameUI.cpp */,
+				B8F42665180584E900AF20A7 /* GameUI.h */,
+			);
+			name = scenes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -554,6 +591,7 @@
 				B8279DF917F3F4F600AD8B7C /* Gem.cpp in Sources */,
 				B8279DFA17F3F4F600AD8B7C /* GemField.cpp in Sources */,
 				B8279DFD17F3F4FD00AD8B7C /* Shared.cpp in Sources */,
+				B8F42666180584E900AF20A7 /* GameUI.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

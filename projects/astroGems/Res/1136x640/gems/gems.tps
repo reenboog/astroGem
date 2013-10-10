@@ -154,6 +154,11 @@
             <filename>white.png</filename>
             <filename>yellow.png</filename>
             <filename>hyperCube.png</filename>
+            <filename>shine.png</filename>
+            <filename>lightning0.png</filename>
+            <filename>lightning1.png</filename>
+            <filename>lightning2.png</filename>
+            <filename>lightning3.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

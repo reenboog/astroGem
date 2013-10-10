@@ -12,6 +12,7 @@ public:
 	virtual void onGemsToBeShuffled() = 0;
 	virtual void onGemsStartedSwapping() = 0;
 	virtual void onGemsFinishedMoving() = 0;
+    virtual void onStartedResolvinMatches(const MatchList &founMatches) = 0;
 	
     // player specific stuff
 	virtual void onMoveMade(bool legal) = 0;

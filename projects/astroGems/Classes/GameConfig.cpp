@@ -29,7 +29,7 @@ GameConfig * GameConfig::sharedInstance() {
 void GameConfig::load() {
     version = kAppVersion;
     
-    gameTimer = kgameTimer;
+    gameTimer = kGameTimer;
     quizTimer = kQuizTimer;
     qMultiplier = kQMultiplier;
     

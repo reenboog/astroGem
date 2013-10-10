@@ -5,6 +5,10 @@
 #include "Gem.h"
 #include "GameConfig.h"
 
+#include "SimpleAudioEngine.h"
+
+using namespace CocosDenshion;
+
 using std::string;
 
 GemField::~GemField() {
@@ -28,6 +32,7 @@ bool GemField::init() {
     
 	const int mask[kFieldHeight][kFieldWidth] = {
 		{1,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,1,1},
 		{1,1,1,1,1,1,1,1},
 		{1,1,1,1,1,1,1,1},
 		{1,1,1,1,1,1,1,1},
@@ -41,6 +46,7 @@ bool GemField::init() {
     
 	const int freezers[kFieldHeight][kFieldWidth] = {
 		{0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
 		{0,0,0,0,0,0,0,0},
 		{0,0,0,0,0,0,0,0},
 		{0,0,0,0,0,0,0,0},
@@ -96,6 +102,7 @@ bool GemField::init() {
    	if(kPreloadField) {
 		const int customField[kFieldHeight][kFieldWidth] = {
 			{2,3,1,2,1,4,2,3},
+            {1,2,1,2,1,4,2,3},
 			{3,4,2,3,5,2,3,2},
 			{4,1,1,4,1,3,2,3},
 			{1,5,3,1,5,2,3,4},
@@ -107,6 +114,7 @@ bool GemField::init() {
         
 		const int customFieldType[kFieldHeight][kFieldWidth] = {
 			{0,0,0,0,0,0,0,0},
+            {0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0},
@@ -225,6 +233,10 @@ MatchList GemField::findMatchesInLine(int fromX, int fromY, int toX, int toY) {
 // Finds and resolves all matches
 void GemField::resolveMatches() {
 	MatchList foundMatches = findMatches();
+    
+    for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
+		(*it)->onStartedResolvinMatches(foundMatches);
+	}
     
 	// First resolve all the matches
 	for(MatchList::iterator it = foundMatches.begin(); it != foundMatches.end(); it++) {
@@ -382,19 +394,21 @@ void GemField::destroyGem(int x, int y, float delay) {
                     }
                     
                     auto applyLightningAtPosWithRotation = [=](const Point &pos, float angle, float delay) {
-//                        Sprite *lightning = Sprite::createWithSpriteFrameName("lightning0.png");
-//                        lightning->setScaleX(1.5);
-//                        this->addChild(lightning, zLighting);
-//                        
-//                        lightning->setPosition(pos);
-//                        lightning->setRotation(angle);
-//                        lightning->setVisible(false),
-//                        lightning->runAction(Sequence::create(DelayTime::create(delay),
-//                                                              Show::create(),
-//                                                              Animate::create(AnimationCache::getInstance()->animationByName("lightning")),
-//                                                              CallFunc::create([=](){
-//                            lightning->removeFromParent();
-//                        }), NULL));
+                        Sprite *lightning = Sprite::createWithSpriteFrameName("lightning0.png");
+                        lightning->setScaleY(2);
+                        lightning->setScaleX(1.5);
+
+                        this->addChild(lightning, zLighting);
+                        
+                        lightning->setPosition(pos);
+                        lightning->setRotation(angle);
+                        lightning->setVisible(false),
+                        lightning->runAction(Sequence::create(DelayTime::create(delay),
+                                                              Show::create(),
+                                                              Animate::create(AnimationCache::getInstance()->animationByName("lightning")),
+                                                              CallFunc::create([=](){
+                            lightning->removeFromParent();
+                        }), NULL));
                         
                     };
                     
@@ -403,6 +417,8 @@ void GemField::destroyGem(int x, int y, float delay) {
 					switch(gems[y][x]->getType()) {
                         case GT_Cross: {
                             gems[y][x]->destroy(delay);
+                            
+                            SimpleAudioEngine::getInstance()->playEffect("laser.wav");
                             
                             destroyLine(x, 0, x, kFieldHeight - 1, true, delay);
                             destroyLine(0, y, kFieldWidth - 1, y, true, delay);
@@ -419,6 +435,9 @@ void GemField::destroyGem(int x, int y, float delay) {
                         } break;
                         case GT_LineHor:
                             gems[y][x]->destroy(delay);
+                            
+                            SimpleAudioEngine::getInstance()->playEffect("laser.wav");
+                            
                             destroyLine(0, y, kFieldWidth - 1, y, true, delay);
                             
                             lightningPos.x = (kFieldWidth * kTileSize) / 2.0f;
@@ -427,6 +446,9 @@ void GemField::destroyGem(int x, int y, float delay) {
                             break;
                         case GT_LineVer:
                             gems[y][x]->destroy(delay);
+                            
+                            SimpleAudioEngine::getInstance()->playEffect("laser.wav");
+                            
                             destroyLine(x, 0, x, kFieldHeight - 1, true, delay);
                             
                             lightningPos.y = (kFieldHeight * kTileSize) / 2.0f;
@@ -862,27 +884,28 @@ void GemField::update(float dt) {
                 }
                 
                 auto applyLightning = [this](const Point &startPos, const Point &endPos, float delay) {
-//                    Sprite *lightning = Sprite::createWithSpriteFrameName("lightning0.png");
-//                    this->addChild(lightning, zGem - 1);
-//                    
-//                    Point yAxe = Point(0, 1);
-//                    Point delta = endPos - startPos;
-//                    float angle = yAxe.getAngle(delta);
-//                    
-//                    float scaleY = delta.getLength() / lightning->getContentSize().height;
-//                    
-//                    lightning->setAnchorPoint({0.5, 0.0});
-//                    lightning->setPosition(startPos);
-//                    lightning->setOpacity(150);
-//                    lightning->setVisible(false);
-//                    lightning->setScaleY(scaleY);
-//                    lightning->setRotation(CC_RADIANS_TO_DEGREES(-angle));
-//                    lightning->runAction(Sequence::create(DelayTime::create(delay),
-//                                                          Show::create(),
-//                                                          Animate::create(AnimationCache::getInstance()->animationByName("lightningSmall")),
-//                                                          CallFunc::create([=](){
-//                        lightning->removeFromParent();
-//                    }), NULL));
+                    Sprite *lightning = Sprite::createWithSpriteFrameName("lightning0.png");
+                    this->addChild(lightning, zGem - 1);
+                    
+                    Point yAxe = Point(0, 1);
+                    Point delta = endPos - startPos;
+                    float angle = yAxe.getAngle(delta);
+                    
+                    float scaleY = delta.getLength() / lightning->getContentSize().height;
+                    
+                    lightning->setAnchorPoint({0.5, 0.0});
+                    lightning->setPosition(startPos);
+                    lightning->setOpacity(150);
+                    lightning->setVisible(false);
+                    lightning->setScaleY(scaleY);
+                    lightning->setRotation(CC_RADIANS_TO_DEGREES(-angle));
+                    lightning->runAction(Sequence::create(DelayTime::create(delay),
+                                                          Show::create(),
+                                                          Animate::create(AnimationCache::getInstance()->animationByName("lightningSmall")),
+                                                          CallFunc::create([=](){
+                        lightning->removeFromParent();
+                    }), NULL));
+
                 };
                 
                 for(int i = 0; i < kFieldHeight; ++i) {

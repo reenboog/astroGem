@@ -2,6 +2,11 @@
 #include "GameScene.h"
 #include "GemField.h"
 #include "Shared.h"
+#include "GameUI.h"
+#include "GameConfig.h"
+#include "SimpleAudioEngine.h"
+
+using namespace CocosDenshion;
 
 #pragma mark - cocos2d stuff
 
@@ -10,16 +15,34 @@ GameScene::~GameScene() {
 
 GameScene::GameScene() {
     field = nullptr;
+    back = nullptr;
+    
+    currentScore = 0;
+    timeLeft = GameConfig::sharedInstance()->gameTimer;
+    scoreMultiplier = 1.0;
+    scoreProgressFadeSpeed = 0;
+    
+    gameOver = true;
 }
 
-#pragma mark - init
+#pragma mark - init/reset
 
 Scene * GameScene::scene() {
     Scene *scene = Scene::create();
 
-    GameScene *layer = GameScene::create();
-    scene->addChild(layer);
-
+    GameScene *gameLayer = GameScene::create();
+    scene->addChild(gameLayer);
+    
+    GameUI *ui = GameUI::create();
+    scene->addChild(ui);
+    
+    gameLayer->setUI(ui);
+    ui->setGameLayer(gameLayer);
+    
+    
+    // start should be here instead
+    gameLayer->reset();
+    
     return scene;
 }
 
@@ -31,8 +54,13 @@ bool GameScene::init() {
     // add sprite sheets
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gems.plist");
 
-
-//    Shared::loadAnimation("animations.plist", "gemDeath");
+    Shared::loadAnimation("animations.plist", "lightning");
+    Shared::loadAnimation("animations.plist", "lightningSmall");
+    
+    // preload effects and music
+    SimpleAudioEngine::getInstance()->preloadEffect("match.wav");
+    SimpleAudioEngine::getInstance()->preloadEffect("wrongMove.wav");
+    SimpleAudioEngine::getInstance()->preloadEffect("laser.wav");
     //
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -43,8 +71,11 @@ bool GameScene::init() {
 
     this->addChild(back, 0);
     
-    Sprite *grid = Sprite::create("temporal/gems/png/grid.png");
+    Sprite *grid = Sprite::create("field/grid.png");
     grid->setPosition({visibleSize.width / 2, visibleSize.height / 2});
+    
+    GameConfig::sharedInstance()->gridPos = grid->getPosition();
+    
     this->addChild(grid);
     
     field = GemField::create();
@@ -65,17 +96,57 @@ bool GameScene::init() {
 
     Director::getInstance()->getTouchDispatcher()->addTargetedDelegate(this, 0, true);
     
+    scheduleUpdate();
+    
     return true;
+}
+
+void GameScene::reset() {
+    currentScore = 0;
+    timeLeft = GameConfig::sharedInstance()->gameTimer;
+    scoreMultiplier = 1.0;
+    
+    gameOver = false;
+    
+    scoreProgressFadeSpeed = kScoreMultiplierFadeInSpeed;
+    
+    ui->reset();
+    
+    ui->setScore(currentScore);
+    ui->setScoreMultiplier(scoreMultiplier);
+    ui->setScoreMultiplierProgress(0);
+    ui->setTimeLeft(timeLeft);
 }
 
 #pragma mark - field watcher delegate
 
 void GameScene::onGemDestroyed(GemColour colour, int x, int y, int score) {
 	// get is destroyed
+    setScore(currentScore + score * scoreMultiplier);
+    
+    if(scoreMultiplier == 1.0) {
+        setScoreMultiplierProgress(scoreMultiplierProgress + 1);
+    }
 }
 
 void GameScene::onGemsMatched(int length, GemColour colour, int startX, int startY, int endX, int endY, int score) {
+    float pitch = 1.0f;
+    
 	// on match
+    if(scoreMultiplier == 1.0) {
+        setScoreMultiplierProgress(scoreMultiplierProgress + length);
+        
+        pitch = clampf(1 + scoreMultiplierProgress / kScoreMultiplierMaxProgress - 0.34, 1, 1.3);
+    } else if(scoreMultiplier == 2.0) {
+        pitch = 1.2;
+    }
+    
+    // play some sound
+    // if length == 3
+    
+    //SimpleAudioEngine::getInstance()->playEffect("match.wav", false, pitch, 0, 1);
+    
+    setScore(currentScore + score * scoreMultiplier);
 }
 
 void GameScene::onGemsToBeShuffled() {
@@ -88,8 +159,26 @@ void GameScene::onGemsFinishedMoving() {
 
 void GameScene::onMoveMade(bool legal) {
 	if(!legal) {
-		//
+		setScoreMultiplierProgress(scoreMultiplierProgress - 6);
+        
+        SimpleAudioEngine::getInstance()->playEffect("wrongMove.wav");
 	}
+}
+
+void GameScene::onStartedResolvinMatches(const MatchList &founMatches) {
+    float pitch = 1;
+
+    if(scoreMultiplier == 1.0) {
+        
+        pitch = clampf(1 + scoreMultiplierProgress / kScoreMultiplierMaxProgress - 0.34, 1, 1.3);
+    } else if(scoreMultiplier == 2.0) {
+        pitch = 1.2;
+    }
+    
+    // play some sound
+    // if length == 3
+    
+    SimpleAudioEngine::getInstance()->playEffect("match.wav", false, pitch, 0, 1);
 }
 
 void GameScene::onGemsStartedSwapping() {
@@ -99,7 +188,58 @@ void GameScene::onGemsStartedSwapping() {
 #pragma mark - update logic
 
 void GameScene::update(float dt) {
+    if(gameOver) {
+        return;
+    }
     
+    scoreMultiplierProgress -= dt * scoreProgressFadeSpeed;
+    setScoreMultiplierProgress(scoreMultiplierProgress);
+    
+    timeLeft -= dt;
+    setTimeLeft(timeLeft);
+}
+
+#pragma mark - setters/getters
+
+void GameScene::setUI(GameUI *ui) {
+    this->ui = ui;
+}
+
+void GameScene::setScoreMultiplierProgress(float progress) {
+    scoreMultiplierProgress = progress;
+    
+    if(scoreMultiplierProgress <= 0) {
+        scoreMultiplierProgress = 0;
+        scoreMultiplier = 1.0;
+        
+        scoreProgressFadeSpeed = kScoreMultiplierFadeInSpeed;
+        // turn effects off
+    } else if(scoreMultiplierProgress >= kScoreMultiplierMaxProgress) {
+        scoreMultiplierProgress = kScoreMultiplierMaxProgress;
+        scoreMultiplier = 2.0;
+        
+        scoreProgressFadeSpeed = kScoreMultiplierFadeOutSpeed;
+        // turn effects on
+    }
+    
+    ui->setScoreMultiplier(scoreMultiplier);
+    ui->setScoreMultiplierProgress(scoreMultiplierProgress);
+}
+
+void GameScene::setTimeLeft(float time) {
+    if(timeLeft <= 0) {
+        timeLeft = 0;
+        // game over
+        gameOver = true;
+    }
+    
+    ui->setTimeLeft(time);
+}
+
+void GameScene::setScore(int score) {
+    currentScore = score;
+    
+    ui->setScore(currentScore);
 }
 
 #pragma mark - touches

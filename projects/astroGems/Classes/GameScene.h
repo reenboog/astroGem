@@ -8,6 +8,7 @@
 USING_NS_CC;
 
 class GemField;
+class GameUI;
 
 class GameScene: public cocos2d::Layer, public FieldWatcherDelegate {
 public:
@@ -17,6 +18,8 @@ public:
     virtual bool init();
     static cocos2d::Scene * scene();
     CREATE_FUNC(GameScene);
+    
+    void reset();
 
     // touches
 	virtual void ccTouchEnded(Touch *touch, Event *event);
@@ -34,6 +37,14 @@ public:
 	virtual void onGemsStartedSwapping();
 	virtual void onGemsFinishedMoving();
 	virtual void onMoveMade(bool legal);
+    virtual void onStartedResolvinMatches(const MatchList &founMatches);
+    
+    void setScoreMultiplierProgress(float progress);
+    void setTimeLeft(float time);
+    void setScore(int score);
+    
+    // some setters/getters
+    void setUI(GameUI *ui);
     
     // update logic
     void update(float dt);
@@ -41,8 +52,19 @@ private:
     GemField *field;
     Sprite *back;
     
+    GameUI *ui;
+    
     bool swipeEnded;
 	bool canTouch;
+
+    bool gameOver;
+    
+    float scoreMultiplier;
+    float scoreMultiplierProgress;
+    float scoreProgressFadeSpeed;
+    
+    float timeLeft;
+    int currentScore;
     
     Point firstTouchLocation;
 };

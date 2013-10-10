@@ -8,6 +8,14 @@
 
 USING_NS_CC;
 
+//temporal constants
+
+#define kGemBonusCloudBackSpriteTag 1000
+#define kGemBonusCloudFrontSpriteTag 1001
+#define kGemBonusShine1SpriteTag 1002
+#define kGemBonusShine2SpriteTag 1003
+#define kGemSelectionTag 1004
+
 using std::string;
 
 #pragma mark - init
@@ -65,6 +73,13 @@ void Gem::reset(int x, int y, GemColour colour, GemType type) {
     setScale(1.0);
     setRotation(0);
     setOpacity(255);
+    
+    // remove temporal bonus sprites if any
+//    this->removeChildByTag(kGemBonusCloudBackSpriteTag, true);
+//    this->removeChildByTag(kGemBonusCloudFrontSpriteTag, true);
+//    this->removeChildByTag(kGemBonusShine1SpriteTag, true);
+//    this->removeChildByTag(kGemBonusShine2SpriteTag, true);
+    this->removeAllChildren();
 }
 
 #pragma mark - bonuses
@@ -78,64 +93,21 @@ void Gem::transformIntoBonus(GemType type, float delay, GemState completionState
 		this->type = type;
 		this->state = GS_Transforming;
         
-		//applyBonusStyling();
-        
 		Action *enlarge = ScaleTo::create(kTransformationTime / 3.f, 1.5f);
-		Action *restyle = nullptr;
         
 		switch(type) {
-//			case GT_Cross:
-//				restyle = FadeTo::create(kTransformationTime / 3.f, 125);
-//				break;
+			case GT_Cross:
+				break;
             case GT_Hypercube:
                 setGemColour(GC_Hypercube);
                 break;
 			case GT_LineHor:
-				//restyle = Sequence::create(ScaleTo::create(kTransformationTime / 6.f, 1, 0),
-                //                           //FlipY::create(true),
-                //                           ScaleTo::create(kTransformationTime / 6.f, 1, 1),
-                //                           NULL);
-				break;
 			case GT_LineVer:
-				//restyle = Sequence::create(ScaleTo::create(kTransformationTime / 6.f, 0, 1),
-                //FlipX::create(true),
-                //                           ScaleTo::create(kTransformationTime / 6.f, 1, 1),
-                //                           NULL);
-				break;
             case GT_LineDestroyer:
-				restyle = Sequence::create(ScaleTo::create(kTransformationTime / 6.f, 1, 0),
-                                           RotateTo::create(0.2, 40),
-                                           ScaleTo::create(kTransformationTime / 6.f, 1, 1),
-                                           NULL);
-				break;
 			default:
-				restyle = DelayTime::create(kTransformationTime / 3.f);
 				break;
 		}
         
-        auto applyAnimation = [&]() {
-            string animationName = "";
-            
-            if(this->type != GT_Hypercube) {
-                switch(colour) {
-                    case GC_Red: animationName = "guitar"; break;
-                    case GC_Green: animationName = "keyboard"; break;
-                    case GC_Blue: animationName = "mic"; break;
-                    case GC_Purple: animationName = "plectrum"; break;
-                    case GC_Yellow: animationName = "mark"; break;
-                    case GC_Orange: animationName = "sax"; break;
-                        
-                    default: CCLOG("default gem color in reset!");
-                }
-            } else {
-                animationName = "note";
-            }
-            
-//            Animate *action = Animate::create(AnimationCache::getInstance()->animationByName(animationName.c_str()));
-//            runAction(RepeatForever::create(action));
-        };
-        
-        //Action *endTransformation = CallFuncN::create(CC_CALLBACK_1(Gem::onTransformationEnd, this));
         Action *endTransformation = nullptr;
         
         switch(completionState) {
@@ -149,7 +121,7 @@ void Gem::transformIntoBonus(GemType type, float delay, GemState completionState
         }
         
 		Action *shrink = ScaleTo::create(kTransformationTime / 3.f, 1);
-        Action *animation = CallFunc::create(applyAnimation);
+        Action *animation = CallFunc::create(CC_CALLBACK_0(Gem::applyBonusStyling, this));
 		Action *destruction = Sequence::create(DelayTime::create(delay),
                                                (FiniteTimeAction*) enlarge,
                                                (FiniteTimeAction*) shrink,
@@ -169,12 +141,116 @@ void Gem::onTransformationEnd(Object *sender) {
 void Gem::applyBonusStyling() {
 	// Add bonus styling
     switch(type) {
-        case GT_Cross: setOpacity(125);
-            break;
-        case GT_LineHor: setFlipY(true);
-            break;
-        case GT_LineVer: setFlipX(true);
-            break;
+        case GT_Cross: {
+            Point pos = {this->getContentSize().width / 2.0f, this->getContentSize().height / 2.0f};
+
+            Sprite *backCloud = Sprite::createWithSpriteFrameName("gemCloudBack.png");
+            backCloud->runAction(RepeatForever::create(RotateBy::create(1.0, -36.0f)));
+            backCloud->setPosition(pos);
+            backCloud->setOpacity(50);
+            backCloud->setTag(kGemBonusCloudBackSpriteTag);
+            
+            this->addChild(backCloud);
+            this->reorderChild(backCloud, -1);
+            
+            Sprite *front = Sprite::createWithSpriteFrameName("gemCloudFront.png");
+            front->setPosition(pos);
+            front->setTag(kGemBonusCloudFrontSpriteTag);
+            
+            Sprite *innerFrontCloud = Sprite::createWithSpriteFrameName("gemCloudFront.png");
+            innerFrontCloud->setAnchorPoint({0.5, 0.5});
+            innerFrontCloud->setPosition(pos);
+            innerFrontCloud->setOpacity(0);
+            innerFrontCloud->setScale(0);
+            
+            front->addChild(innerFrontCloud);
+            
+            innerFrontCloud->runAction(RepeatForever::create(Sequence::create(DelayTime::create(0.3),
+                                                                              Spawn::create(FadeIn::create(0.5),
+                                                                                            ScaleTo::create(0.5, 1.0), NULL),
+                                                                              Spawn::create(FadeOut::create(0.2), NULL),
+                                                                              ScaleTo::create(0.0001, 0.0),
+                                                                              NULL)));
+            
+            this->addChild(front);
+            this->reorderChild(front, 1);
+        } break;
+        case GT_LineHor:
+        case GT_LineVer:
+        case GT_LineDestroyer: {
+            
+            Point pos = {this->getContentSize().width / 2.0f, this->getContentSize().height / 2.0f};
+            
+            Sprite *backCloud = Sprite::createWithSpriteFrameName("gemCloudBack.png");
+            backCloud->runAction(RepeatForever::create(RotateBy::create(1.0, 36.0f)));
+            backCloud->setPosition(pos);
+            backCloud->setOpacity(80);
+            backCloud->setTag(kGemBonusCloudBackSpriteTag);
+            
+            this->addChild(backCloud);
+            this->reorderChild(backCloud, -1);
+            
+            pos = Point(this->getContentSize().width * 0.4f, this->getContentSize().height * 0.6f);
+            
+            Sprite *shine1 = Sprite::createWithSpriteFrameName("shine.png");
+            shine1->runAction(RepeatForever::create(RotateBy::create(1.0, -36.0f)));
+            shine1->setPosition(pos);
+            shine1->setScale(0.6);
+            shine1->setOpacity(100);
+            shine1->setTag(kGemBonusShine1SpriteTag);
+            
+            this->addChild(shine1, 1);
+            
+            Sprite *shine2 = Sprite::createWithSpriteFrameName("shine.png");
+            shine2->runAction(RepeatForever::create(Spawn::create(RotateBy::create(1.0, -10.0f),
+                                                                  Sequence::create(FadeOut::create(2),
+                                                                                   DelayTime::create(1),
+                                                                                   FadeIn::create(1), NULL), NULL)));
+            shine2->setPosition(pos);
+            shine2->setOpacity(100);
+            shine2->setScale(0.4);
+            shine2->setTag(kGemBonusShine2SpriteTag);
+            
+            this->addChild(shine2, 2);
+
+        } break;
+        case GT_Hypercube: {
+            this->runAction(RepeatForever::create(RotateBy::create(1, -40)));
+            
+            Point pos = Point(this->getContentSize().width / 2.0f, this->getContentSize().height / 2.0f);
+            
+//            Sprite *shine1 = Sprite::createWithSpriteFrameName("shine.png");
+//            shine1->runAction(RepeatForever::create(RotateBy::create(1.0, -36.0f)));
+//            shine1->setPosition(pos);
+//            shine1->setScale(0.6);
+//            shine1->setOpacity(100);
+//            shine1->setTag(kGemBonusShine1SpriteTag);
+//            
+//            this->addChild(shine1, 1);
+//            
+//            Sprite *shine2 = Sprite::createWithSpriteFrameName("shine.png");
+//            shine2->runAction(RepeatForever::create(Spawn::create(RotateBy::create(1.0, -10.0f),
+//                                                                  Sequence::create(FadeOut::create(2),
+//                                                                                   DelayTime::create(1),
+//                                                                                   FadeIn::create(1), NULL), NULL)));
+//            shine2->setPosition(pos);
+//            shine2->setOpacity(100);
+//            shine2->setScale(0.4);
+//            shine2->setTag(kGemBonusShine2SpriteTag);
+//            
+//            this->addChild(shine2, 2);
+            
+            Sprite *backCloud = Sprite::createWithSpriteFrameName("gemCloudBack.png");
+            backCloud->runAction(RepeatForever::create(RotateBy::create(1.0, -40.0f)));
+            backCloud->setPosition(pos);
+            backCloud->setOpacity(80);
+            backCloud->setScale(0.6);
+            backCloud->setTag(kGemBonusCloudBackSpriteTag);
+            
+            this->addChild(backCloud);
+            this->reorderChild(backCloud, -1);
+
+        } break;
         default:
             break;
     }
@@ -189,11 +265,34 @@ void Gem::onMovementEnd(Object *sender) {
 void Gem::select() {
 	state = GS_Selected;
 	setScale(1.2f);
+    
+//    Point pos = {this->getContentSize().width / 2.0, this->getContentSize().height / 2.0};
+//    
+//    Sprite *selection = Sprite::createWithSpriteFrameName("selection.png");
+//    this->addChild(selection);
+//
+//    selection->setScale(2);
+//    selection->setOpacity(0);
+//    selection->setPosition(pos);
+//    selection->setTag(kGemSelectionTag);
+//    
+//    selection->runAction(Spawn::create(FadeIn::create(0.2),
+//                                       ScaleTo::create(0.12, 1),
+//                                       NULL));
 }
 
 void Gem::deselect() {
 	state = GS_Idle;
 	setScale(1);
+    
+//    Node *selection = this->getChildByTag(kGemSelectionTag);
+//    
+//    if(selection) {
+//        selection->runAction(Sequence::create(FadeOut::create(0.1),
+//                                              CallFunc::create([=](){
+//                                                    selection->removeFromParent();
+//                                            }), NULL));
+//    }
 }
 
 #pragma mark - swapping

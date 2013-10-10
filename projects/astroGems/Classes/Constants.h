@@ -1,8 +1,11 @@
 #ifndef __CONSTANTS_H__
 #define __CONSTANTS_H__
 
+#include <vector>
+#include <list>
+
 #define kFieldWidth 8
-#define kFieldHeight 8
+#define kFieldHeight 9
 
 #define kGemTypeAmount 7
 
@@ -24,14 +27,16 @@
 
 #define kTipDelay 1.f
 
-#define kTransformationTime 0.3f
+#define kTransformationTime 0.2f
 
-#define kColumnsFallDelay 0.8
-#define kRowsFallDelay 0.8
-
-#define kPlayersAmount 2
+#define kColumnsFallDelay 0.5
+#define kRowsFallDelay 0.3
 
 #define kSpawnBonuses 1
+
+#define kScoreMultiplierFadeOutSpeed 4
+#define kScoreMultiplierFadeInSpeed 2
+#define kScoreMultiplierMaxProgress 20
 
 const bool kPreloadField = true;
 
@@ -105,6 +110,29 @@ enum FieldState {
     FS_TurningGemsToFourInRowIcons,
     FS_DestroyingFourInRowIcons,
 };
+
+struct Match {
+	Match(int fromX, int fromY, int toX, int toY, GemColour colour) {
+		this->fromX = fromX;
+		this->fromY = fromY;
+		this->toX = toX;
+		this->toY = toY;
+		this->length = (toX - fromX) + (toY - fromY) + 1;
+		this->colour = colour;
+	}
+    
+	Match() {}
+    
+	int fromX;
+	int fromY;
+	int toX;
+	int toY;
+	int length;
+	GemColour colour;
+};
+
+typedef std::list<Match> MatchList;
+
 
 #if(kSpawnBonuses == 1)
     const GemType kVerticalMatchFourBonus = GT_LineDestroyer;

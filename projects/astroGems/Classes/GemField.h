@@ -10,28 +10,6 @@ class Player;
 
 USING_NS_CC;
 
-struct Match {
-	Match(int fromX, int fromY, int toX, int toY, GemColour colour) {
-		this->fromX = fromX;
-		this->fromY = fromY;
-		this->toX = toX;
-		this->toY = toY;
-		this->length = (toX - fromX) + (toY - fromY) + 1;
-		this->colour = colour;
-	}
-    
-	Match() {}
-    
-	int fromX;
-	int fromY;
-	int toX;
-	int toY;
-	int length;
-	GemColour colour;
-};
-
-typedef std::list<Match> MatchList;
-
 struct Move {
 	Move(int fromX, int fromY, int toX, int toY, MatchList matches) {
 		this->fromX = fromX;
