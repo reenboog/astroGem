@@ -31,9 +31,9 @@ public:
 	GemType getType();
     void setType(GemType type);
     
-    void prepareToBeDestroyedByNote();
-    void prepareToTurnIntoBombByNote();
-    void prepareToExplodeByNote();
+    void prepareToBeDestroyedByHypercube();
+    void prepareToTurnIntoBombByHypercube();
+    void prepareToExplodeByHypercube();
     void prepareToTurnIntoCrossExplosion();
     
     void setGemColour(GemColour color);

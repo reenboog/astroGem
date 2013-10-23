@@ -20,7 +20,7 @@ USING_NS_CC;
 
 #define kBaseIconValue      50
 #define kFourInRowIconValue 500
-#define kNoteIconValue      100
+#define kHypercubeIconValue 1000
 
 class GameConfig {
 private:
@@ -43,7 +43,7 @@ public:
     
     float baseIconValue;
     float fourInRowIconValue;
-    float noteIconValue;
+    float hypercubeIconValue;
     
     // required to align ui
     Point gridPos;

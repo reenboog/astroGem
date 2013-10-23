@@ -111,8 +111,8 @@ void Gem::transformIntoBonus(GemType type, float delay, GemState completionState
         Action *endTransformation = nullptr;
         
         switch(completionState) {
-            case GS_AboutToExplodeByNote:
-                endTransformation = CallFunc::create(CC_CALLBACK_0(Gem::prepareToExplodeByNote, this));
+            case GS_AboutToExplodeByHypercube:
+                endTransformation = CallFunc::create(CC_CALLBACK_0(Gem::prepareToExplodeByHypercube, this));
                 break;
             case GS_Transformed:
             default:
@@ -337,11 +337,11 @@ void Gem::moveTo(int x, int y, float time, bool goBack, int blocksToWait, int ro
     Action *endMove = nullptr;
     
     switch(completionState) {
-        case GS_AboutToDestroyByNote:
-            endMove = CallFunc::create(CC_CALLBACK_0(Gem::prepareToBeDestroyedByNote, this));
+        case GS_AboutToDestroyByHypercube:
+            endMove = CallFunc::create(CC_CALLBACK_0(Gem::prepareToBeDestroyedByHypercube, this));
             break;
         case GS_AboutToTurnIntoBomb:
-            endMove = CallFunc::create(CC_CALLBACK_0(Gem::prepareToTurnIntoBombByNote, this));
+            endMove = CallFunc::create(CC_CALLBACK_0(Gem::prepareToTurnIntoBombByHypercube, this));
             break;
         case GS_AboutToExplodeWithCross:
             endMove = CallFunc::create(CC_CALLBACK_0(Gem::prepareToTurnIntoCrossExplosion, this));
@@ -401,11 +401,11 @@ GemColour Gem::getGemColour() {
 
 #pragma mark - bonus helpers
 
-void Gem::prepareToBeDestroyedByNote() {
-    state = GS_AboutToDestroyByNote;
+void Gem::prepareToBeDestroyedByHypercube() {
+    state = GS_AboutToDestroyByHypercube;
 }
 
-void Gem::prepareToTurnIntoBombByNote() {
+void Gem::prepareToTurnIntoBombByHypercube() {
     state = GS_AboutToTurnIntoBomb;
 }
 
@@ -413,8 +413,8 @@ void Gem::prepareToTurnIntoCrossExplosion() {
     state = GS_AboutToExplodeWithCross;
 }
 
-void Gem::prepareToExplodeByNote() {
-    state = GS_AboutToExplodeByNote;
+void Gem::prepareToExplodeByHypercube() {
+    state = GS_AboutToExplodeByHypercube;
 }
 
 void Gem::setGemColour(GemColour color) {
@@ -576,7 +576,7 @@ int Gem::scoreForGem(GemType type) {
             score = GameConfig::sharedInstance()->fourInRowIconValue;
             break;
         case GT_Hypercube:
-            score = GameConfig::sharedInstance()->noteIconValue;
+            score = GameConfig::sharedInstance()->hypercubeIconValue;
             break;
         case GT_Colour:
             score = GameConfig::sharedInstance()->baseIconValue;

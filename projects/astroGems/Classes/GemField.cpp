@@ -103,10 +103,10 @@ bool GemField::init() {
 		const int customField[kFieldHeight][kFieldWidth] = {
 			{2,3,1,2,1,4,2,3},
             {1,2,1,2,1,4,2,3},
-			{3,4,2,3,5,2,3,2},
+			{3,4,2,3,2,2,3,2},
 			{4,1,1,4,1,3,2,3},
-			{1,5,3,1,5,2,3,4},
-			{3,4,3,3,5,3,4,2},
+			{1,2,3,1,1,2,3,4},
+			{3,4,3,3,2,3,4,2},
 			{1,2,1,3,1,2,1,3},
             {4,1,3,2,2,1,3,1},
             {4,2,3,1,2,3,3,2}
@@ -381,7 +381,9 @@ void GemField::destroyLine(int fromX, int fromY, int toX, int toY, bool destroyT
 
 void GemField::destroyGem(int x, int y, float delay) {
 	if(fieldMask[y][x] == 1) {
-		if(gems[y][x]->getState() != GS_Destroying && gems[y][x]->getState() != GS_AboutToExplodeByNote) {
+        GemState gemState = gems[y][x]->getState();
+        
+		if(gemState != GS_Destroying && gemState != GS_AboutToExplodeByHypercube) {
 			if(freezeMask[y][x] > 1) {
 				freezeGem(y, x, freezeMask[y][x] - 1);
 			} else {
@@ -467,7 +469,7 @@ void GemField::destroyGem(int x, int y, float delay) {
                 
                 int score = Gem::scoreForGem(gems[y][x]->getType());
                 
-				if(gems[y][x]->getState() != GS_Matched) {
+				if(gemState != GS_Matched) {
 					for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
 						(*it)->onGemDestroyed(gems[y][x]->getGemColour(), x, y, score);
 					}
@@ -602,11 +604,11 @@ void GemField::swapGems(int fromX, int fromY, int toX, int toY) {
     if(first->getType() == GT_Hypercube || second->getType() == GT_Hypercube) {
         skipMatchLookup = true;
         
-        Gem *noteMaker = nullptr;
+        Gem *hypercubeMaker = nullptr;
         Gem *gem = nullptr;
         
         if(first->getType() == GT_Hypercube) {
-            noteMaker = first;
+            hypercubeMaker = first;
             gem = second;
             
             int tx = fromX;
@@ -618,7 +620,7 @@ void GemField::swapGems(int fromX, int fromY, int toX, int toY) {
             toY = ty;
             
         } else {
-            noteMaker = second;
+            hypercubeMaker = second;
             gem = first;
             
         }
@@ -627,14 +629,14 @@ void GemField::swapGems(int fromX, int fromY, int toX, int toY) {
             case GT_Colour:
                 state = FS_SwappingHypercubeWithNormalIcon;
                 
-                gem->swapTo(toX, toY, false, GS_AboutToDestroyByNote);
-                noteMaker->swapTo(fromX, fromY, false, GS_AboutToDestroyByNote);
+                gem->swapTo(toX, toY, false, GS_AboutToDestroyByHypercube);
+                hypercubeMaker->swapTo(fromX, fromY, false, GS_AboutToDestroyByHypercube);
                 
                 // todo: we don't take care about mask here
                 for(int i = 0; i < kFieldHeight; ++i) {
                     for(int j = 0; j < kFieldWidth; ++j) {
-                        if(gem != gems[i][j] && noteMaker != gems[i][j] && gems[i][j]->getType() == GT_Colour && gem->getGemColour() == gems[i][j]->getGemColour()) {
-                            gems[i][j]->prepareToBeDestroyedByNote();
+                        if(fieldMask[i][j] == 1 && gem != gems[i][j] && hypercubeMaker != gems[i][j] && gems[i][j]->getType() == GT_Colour && gem->getGemColour() == gems[i][j]->getGemColour()) {
+                            gems[i][j]->prepareToBeDestroyedByHypercube();
                         }
                     }
                 }
@@ -643,12 +645,12 @@ void GemField::swapGems(int fromX, int fromY, int toX, int toY) {
                 state = FS_SwappingHypercubeWithFourInRowIcon;
                 
                 gem->swapTo(toX, toY, false, GS_AboutToTurnIntoBomb);
-                noteMaker->swapTo(fromX, fromY, false, GS_AboutToDestroyByNote);
+                hypercubeMaker->swapTo(fromX, fromY, false, GS_AboutToDestroyByHypercube);
                 
                 for(int i = 0; i < kFieldHeight; ++i) {
                     for(int j = 0; j < kFieldWidth; ++j) {
-                        if(gem != gems[i][j] && noteMaker != gems[i][j] && gems[i][j]->getType() == GT_Colour && gem->getGemColour() == gems[i][j]->getGemColour()) {
-                            gems[i][j]->prepareToTurnIntoBombByNote();
+                        if(fieldMask[i][j] == 1 && gem != gems[i][j] && hypercubeMaker != gems[i][j] && gems[i][j]->getType() == GT_Colour && gem->getGemColour() == gems[i][j]->getGemColour()) {
+                            gems[i][j]->prepareToTurnIntoBombByHypercube();
                         }
                     }
                 }
@@ -871,13 +873,13 @@ void GemField::update(float dt) {
         case FS_SwappingHypercubeWithNormalIcon:
             if(!areGemsBeingMoved()) {
                 
-                // get a note first
-                Gem *noteMaker = nullptr;
+                // get a hypercube first
+                Gem *hypercubeMaker = nullptr;
                 
                 for(int i = 0; i < kFieldHeight; ++i) {
                     for(int j = 0; j < kFieldWidth; ++j) {
-                        if(noteMaker == nullptr && gems[i][j]->getState() == GS_AboutToDestroyByNote && gems[i][j]->getType() == GT_Hypercube) {
-                            noteMaker = gems[i][j];
+                        if(hypercubeMaker == nullptr && fieldMask[i][j] == 1 && gems[i][j]->getState() == GS_AboutToDestroyByHypercube && gems[i][j]->getType() == GT_Hypercube) {
+                            hypercubeMaker = gems[i][j];
                             break;
                         }
                     }
@@ -912,13 +914,13 @@ void GemField::update(float dt) {
                     for(int j = 0; j < kFieldWidth; ++j) {
                         Gem *gem = gems[i][j];
                         
-                        if(gem->getState() == GS_AboutToDestroyByNote) {
+                        if(fieldMask[i][j] == 1 && gem->getState() == GS_AboutToDestroyByHypercube) {
                             
                             float delay = i * 0.02 + j * 0.03;
                             this->destroyGem(j, i, delay);
                             // apply lightning
                             Point endPos = Gem::convertCoordinatesToPixels(j, i);
-                            applyLightning(noteMaker->getPosition(), endPos, delay);
+                            applyLightning(hypercubeMaker->getPosition(), endPos, delay);
                         }
                     }
                 }
@@ -935,7 +937,7 @@ void GemField::update(float dt) {
                     for(int j = 0; j < kFieldWidth; ++j) {
                         Gem *gem = gems[i][j];
                         
-                        if(gem->getState() == GS_AboutToExplodeWithCross) {
+                        if(fieldMask[i][j] == 1 && gem->getState() == GS_AboutToExplodeWithCross) {
                             gem->setType(GT_Cross);
                             this->destroyGem(j, i);
                         }
@@ -950,8 +952,8 @@ void GemField::update(float dt) {
                     for(int j = 0; j < kFieldWidth; ++j) {
                         Gem *gem = gems[i][j];
                         
-                        if(gem->getState() == GS_AboutToTurnIntoBomb) {
-                            gem->transformIntoBonus(GT_LineDestroyer, i * 0.06 + j * 0.04, GS_AboutToExplodeByNote);
+                        if(fieldMask[i][j] == 1 && gem->getState() == GS_AboutToTurnIntoBomb) {
+                            gem->transformIntoBonus(GT_LineDestroyer, i * 0.06 + j * 0.04, GS_AboutToExplodeByHypercube);
                             // apply state here
                         }
                     }
@@ -965,9 +967,9 @@ void GemField::update(float dt) {
                     for(int j = 0; j < kFieldWidth; ++j) {
                         Gem *gem = gems[i][j];
                         
-                        if(gem->getState() == GS_AboutToExplodeByNote || gem->getState() == GS_AboutToDestroyByNote) {
+                        if(fieldMask[i][j] == 1 && (gem->getState() == GS_AboutToExplodeByHypercube || gem->getState() == GS_AboutToDestroyByHypercube)) {
                             //gem->transformIntoBonus(GT_LineDestroyer, i * 0.06 + j * 0.04);
-                            gem->setState(GS_ExplodingByNote);
+                            gem->setState(GS_ExplodingByHypercube);
                             this->destroyGem(j, i, i * 0.06 + j * 0.04);
                         }
                     }
@@ -1042,7 +1044,6 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
 		int distanceBetweenEmpty = 0;
 		int lastDistance = 0;
         
-        
 		// Until we reach the top of the line
 		while(y >= 0) {
 			// If there is a gem
@@ -1055,7 +1056,7 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
                     // If the gem is not destroyed - move it down
 					distanceBetweenEmpty++;
 					moveGem(lineNumber, y, lineNumber, y + destroyedGems + emptyBlocks, columnsWithMatches);
-                    
+
 					if(emptyBlocks > 0) {
 						timesToFall--;
 						while(timesToFall <= 0 && emptyBlocks > 0) {
@@ -1079,6 +1080,7 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
 			}
 			y--;
 		}
+        
 		y += destroyedGems + emptyBlocks;
 		int gemsFallen = 0;
 		while(y >= 0) {
@@ -1123,8 +1125,10 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
 #pragma mark -
 
 void GemField::moveGem(int fromX, int fromY, int toX, int toY, int rowsToWait) {
-	if(fromX != toX || fromY != toY)
-	{
+//    if(fieldMask[fromY][fromX] == 0 || fieldMask[toY][toX] == 0) {
+//        CCLOG("null! %i, %i, %i, %i", fromX, fromY, toX, toY);
+//    } else
+    if(fromX != toX || fromY != toY) {
 		swapGemsIndices(fromX, fromY, toX, toY);
 		gems[toY][toX]->fallTo(toX, toY, 0, rowsToWait);
 	}
@@ -1292,8 +1296,7 @@ MoveList GemField::getMovesForLine(int fromX, int fromY, int toX, int toY) {
 Move GemField::getGemMove(int x, int y, Direction direction) {
 	int stepX = 0;
 	int stepY = 0;
-	switch (direction)
-	{
+	switch(direction) {
 		case D_Down: stepY = 1;
 			break;
 		case D_Up: stepY = -1;
@@ -1305,6 +1308,7 @@ Move GemField::getGemMove(int x, int y, Direction direction) {
 		default:
 			break;
 	}
+    
 	if(x >= 0 && x < kFieldWidth && y >=0 && y < kFieldHeight && x + stepX >= 0 && x + stepX < kFieldWidth && y + stepY >=0 && y + stepY < kFieldHeight) {
 		if(fieldMask[y + stepY][x + stepX] == 1 && fieldMask[y][x] == 1 && freezeMask[y + stepY][x + stepX] == 0 && freezeMask[y][x] == 0) {
 			swapGemsIndices(x, y, x + stepX, y + stepY);

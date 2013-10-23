@@ -38,7 +38,7 @@
 #define kScoreMultiplierFadeInSpeed 2
 #define kScoreMultiplierMaxProgress 20
 
-const bool kPreloadField = true;
+const bool kPreloadField = false;
 
 enum GemColour {
 	GC_Random,
@@ -62,9 +62,9 @@ enum GemState {
 	GS_Transformed,
 	GS_Destroying,
 	GS_Destroyed,
-    GS_AboutToDestroyByNote,
-    GS_AboutToExplodeByNote,
-    GS_ExplodingByNote,
+    GS_AboutToDestroyByHypercube,
+    GS_AboutToExplodeByHypercube,
+    GS_ExplodingByHypercube,
     GS_AboutToTurnIntoBomb,
     GS_AboutToExplodeWithCross,
 	GS_Immovable

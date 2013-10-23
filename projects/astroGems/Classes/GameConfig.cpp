@@ -35,7 +35,7 @@ void GameConfig::load() {
     
     baseIconValue = kBaseIconValue;
     fourInRowIconValue = kFourInRowIconValue;
-    noteIconValue = kNoteIconValue;
+    hypercubeIconValue = kHypercubeIconValue;
 }
 
 void GameConfig::save() {
