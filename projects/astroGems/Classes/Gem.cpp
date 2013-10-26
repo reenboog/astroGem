@@ -298,41 +298,45 @@ void Gem::deselect() {
 #pragma mark - swapping
 
 void Gem::swapTo(int x, int y, bool goBack, GemState completionState) {
-	moveTo(x, y, kSwapTime, goBack, 0, 0, completionState);
+	moveTo(x, y, kSwapTime, goBack, 0, 0, completionState, true);
 }
 
 void Gem::fallTo(int x, int y, int blocksToWait, int rowsToWait) {
 	moveTo(x, y, kFallTime, false, blocksToWait, rowsToWait);
 }
 
-void Gem::moveTo(int x, int y, float time, bool goBack, int blocksToWait, int rowsToWait, GemState completionState) {
+void Gem::moveTo(int x, int y, float time, bool goBack, int blocksToWait, int rowsToWait, GemState completionState, bool swapping) {
     
     if(state == GS_Moving) {
         return;
     }
     
-	Point newLocation = convertCoordinatesToPixels(x, y);
+    Point newLocation = convertCoordinatesToPixels(x, y);
+    Point currentPos = getPosition();
+    
+    Point delta = (newLocation - currentPos).normalize();
+    
+    float rowDelay = 0;
+    
+    if(newLocation.y < currentPos.y && !swapping) {
+        int gemRow = currentPos.y / kTileSize;
+        rowDelay = gemRow * 0.021;
+    }
+    
+    float moveDownDelay = 0;
+    
+    if(swapping && !goBack) {
+        moveDownDelay = 0.1;
+    }
+    
+    MoveTo *moveDown = MoveTo::create(((this->getPosition().getDistance(newLocation) / kTileSize) * time) * 0.7f,
+                                      newLocation + Point(delta.x * kTileSize * 0.2f, delta.y * kTileSize * 0.2f));
+    
+    MoveBy *moveUp = MoveBy::create(0.15, -Point(delta.x * kTileSize * 0.2, delta.y * kTileSize * 0.2f));
+    Sequence *move = Sequence::create(moveDown, DelayTime::create(moveDownDelay), moveUp, NULL);
+    Action *wait = DelayTime::create(blocksToWait * kFallTime * kColumnsFallDelay + rowsToWait * kFallTime * kRowsFallDelay + rowDelay);
 	
-    Action *wait = DelayTime::create(blocksToWait * kFallTime * kColumnsFallDelay + rowsToWait * kFallTime * kRowsFallDelay);
-	Action *move = nullptr;
-    
-    if(blocksToWait >= 1) {
-		Action *moveDown = MoveTo::create((this->getPosition().getDistance(newLocation) / kTileSize) * time * 0.7f,
-                                          newLocation + Point(0, kTileSize * 0.1f));
-        
-		Action *moveUp = MoveTo::create((this->getPosition().getDistance(newLocation) / kTileSize) * time * 0.2f,
-                                        newLocation - Point(0, kTileSize * 0.1f));
-        
-		Action *moveDownAgain = MoveTo::create((this->getPosition().getDistance(newLocation) / kTileSize) * time * 0.1f,
-                                               newLocation);
-        
-		move = Sequence::create((FiniteTimeAction*) moveDown, (FiniteTimeAction*) moveUp, (FiniteTimeAction*) moveDownAgain, NULL);
-	} else {
-		move = MoveTo::create((this->getPosition().getDistance(newLocation) / kTileSize) * time, newLocation);
-	}
-    
-	Action *moveBack = MoveTo::create((this->getPosition().getDistance(newLocation) / kTileSize) * time, this->getPosition());
-	Action *movement = nullptr;
+    Action *movement = nullptr;
     
     Action *endMove = nullptr;
     
@@ -350,6 +354,8 @@ void Gem::moveTo(int x, int y, float time, bool goBack, int blocksToWait, int ro
         default:
             endMove = CallFuncN::create(CC_CALLBACK_1(Gem::onMovementEnd, this));
     }
+    
+    Action *moveBack = MoveTo::create((this->getPosition().getDistance(newLocation) / kTileSize) * time, this->getPosition());
     
 	if(goBack) {
 		movement = Sequence::create((FiniteTimeAction*) wait, (FiniteTimeAction*) move, (FiniteTimeAction*) moveBack, (FiniteTimeAction*) endMove, NULL);
