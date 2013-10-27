@@ -99,17 +99,17 @@ bool GemField::init() {
     
     state = FS_Ready;
     
-   	if(kPreloadField) {
+   	if(1) {
 		const int customField[kFieldHeight][kFieldWidth] = {
 			{2,3,1,2,1,4,2,3},
             {1,2,1,2,1,4,2,3},
 			{3,4,2,3,2,2,3,2},
 			{4,1,1,4,1,3,2,3},
-			{1,2,3,1,1,2,3,4},
-			{3,4,3,3,2,3,4,2},
-			{1,2,1,3,1,2,1,3},
+			{1,2,3,2,1,2,3,4},
+			{3,4,3,2,2,3,4,2},
+			{1,2,2,3,1,2,1,3},
             {4,1,3,2,2,1,3,1},
-            {4,2,3,1,2,3,3,2}
+            {4,2,3,2,1,3,3,2}
 		};
         
 		const int customFieldType[kFieldHeight][kFieldWidth] = {
@@ -135,7 +135,6 @@ bool GemField::init() {
 	shuffleField(false);
     
     scheduleUpdate();
-    
     
     return true;
 }
@@ -185,6 +184,8 @@ MatchList GemField::findMatchesInLine(int fromX, int fromY, int toX, int toY) {
 	}
     
 	int currentValue = gems[y][x]->getGemColour();
+    GemType currentType = gems[y][x]->getType();
+    GemState currentState = gems[y][x]->getState();
 	int chainLength = 1;
     
 	x += stepX;
@@ -192,7 +193,8 @@ MatchList GemField::findMatchesInLine(int fromX, int fromY, int toX, int toY) {
     
 	while(x <= toX && y <= toY) {
 		while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue) &&
-              !(gems[y][x]->getType() == GT_Hypercube && gems[y][x]->getState() != GS_Transformed)) {
+              !(gems[y][x]->getType() == GT_Hypercube && gems[y][x]->getState() != GS_Transformed) &&
+              !(currentType == GT_Hypercube && currentState != GS_Transformed)) {
             
 			x += stepX;
 			y += stepY;
@@ -220,6 +222,9 @@ MatchList GemField::findMatchesInLine(int fromX, int fromY, int toX, int toY) {
 		}
         
 		currentValue = gems[y][x]->getGemColour();
+        currentType = gems[y][x]->getType();
+        currentState = gems[y][x]->getState();
+
 		chainLength = 1;
 		x += stepX;
 		y += stepY;
@@ -395,26 +400,71 @@ void GemField::destroyGem(int x, int y, float delay) {
                         gems[y][x]->setType((GemType)(GT_LineHor + (GemType)(rand() % 2)));
                     }
                     
-                    auto applyLightningAtPosWithRotation = [=](const Point &pos, float angle, float delay) {
-                        Sprite *lightning = Sprite::createWithSpriteFrameName("lightning0.png");
-                        lightning->setScaleY(2);
-                        lightning->setScaleX(1.5);
+                    auto applyLightningAtPosWithXYDirectionsDelayAndColor = [=](const Point &pos, int xDir, int yDir, float delay, Color3B lightningColor) {
+                        int squaresCount = MAX(kFieldHeight, kFieldWidth) * 2;
+                        
+                        Point currentIndices = {pos.x / kTileSize, kFieldHeight - pos.y / kTileSize};
+                        
+                        auto placeSprite = [this](const Point &index, float delay, Color3B color) {
+                            if(index.x >= kFieldWidth || index.x < 0 || index.y >= kFieldHeight || index.y < 0) {
+                                return;
+                            }
+                            
+                            Sprite *lightning = Sprite::createWithSpriteFrameName("lightningSquare.png");
+                            
+                            lightning->setOpacity(0);
+                            lightning->setColor(color);
+                            
+                            this->addChild(lightning, zGem - 1);
+                            
+                            Point pos = Gem::convertCoordinatesToPixels(index.x, index.y);
+                            
+                            lightning->setPosition(pos);
+                            lightning->runAction(Sequence::create(DelayTime::create(delay),
+                                                                  FadeTo::create(0.1, 150),
+                                                                  DelayTime::create(0.16),
+                                                                  CallFunc::create([=](){
+                                lightning->removeFromParent();
+                            }), NULL));
 
-                        this->addChild(lightning, zLighting);
+                        };
                         
-                        lightning->setPosition(pos);
-                        lightning->setRotation(angle);
-                        lightning->setVisible(false),
-                        lightning->runAction(Sequence::create(DelayTime::create(delay),
-                                                              Show::create(),
-                                                              Animate::create(AnimationCache::getInstance()->animationByName("lightning")),
-                                                              CallFunc::create([=](){
-                            lightning->removeFromParent();
-                        }), NULL));
-                        
+                        for(int i = 0; i < squaresCount; ++i) {
+                            placeSprite({currentIndices.x + xDir * i, currentIndices.y + yDir * i}, delay + 0.03 * i, lightningColor);
+                            placeSprite({currentIndices.x - xDir * i, currentIndices.y - yDir * i}, delay + 0.03 * i, lightningColor);
+                        }
                     };
                     
                     Point lightningPos = Gem::convertCoordinatesToPixels(x, y);
+                    
+                    Color3B lightningColor;
+                    
+                    switch(gems[y][x]->getGemColour()) {
+                        case GC_Red:
+                            lightningColor = {255, 50, 50};
+                            break;
+                        case GC_Green:
+                            lightningColor = {50, 255, 50};
+                            break;
+                        case GC_Blue:
+                            lightningColor = {50, 50, 255};
+                            break;
+                        case GC_Purple:
+                            lightningColor = {255, 50, 255};
+                            break;
+                        case GC_Orange:
+                            lightningColor = {255, 150, 0};
+                            break;
+                        case GC_Yellow:
+                            lightningColor = {255, 255, 0};
+                            break;
+                        case GC_White:
+                        case GC_Hypercube:
+                        case GC_Random:
+                            lightningColor = {255, 255, 255};
+                        default:
+                            break;
+                    }
                     
 					switch(gems[y][x]->getType()) {
                         case GT_Cross: {
@@ -425,37 +475,26 @@ void GemField::destroyGem(int x, int y, float delay) {
                             destroyLine(x, 0, x, kFieldHeight - 1, true, delay);
                             destroyLine(0, y, kFieldWidth - 1, y, true, delay);
                             
-                            Point firstLightningPos = lightningPos;
-                            firstLightningPos.x = (kFieldWidth * kTileSize) / 2.0f;
-                            
-                            applyLightningAtPosWithRotation(firstLightningPos, 90, delay);
-                            
-                            Point secondLightningPos = lightningPos;
-                            secondLightningPos.y = (kFieldHeight * kTileSize) / 2.0f;
-                            
-                            applyLightningAtPosWithRotation(secondLightningPos, 0, delay);
+                            applyLightningAtPosWithXYDirectionsDelayAndColor(lightningPos, 1, 0, delay, lightningColor);
+                            applyLightningAtPosWithXYDirectionsDelayAndColor(lightningPos, 0, 1, delay, lightningColor);
                         } break;
                         case GT_LineHor:
                             gems[y][x]->destroy(delay);
                             
-                            SimpleAudioEngine::getInstance()->playEffect("laser.wav");
+                            //SimpleAudioEngine::getInstance()->playEffect("laser.wav");
                             
                             destroyLine(0, y, kFieldWidth - 1, y, true, delay);
                             
-                            lightningPos.x = (kFieldWidth * kTileSize) / 2.0f;
-                            
-                            applyLightningAtPosWithRotation(lightningPos, 90, delay);
+                            applyLightningAtPosWithXYDirectionsDelayAndColor(lightningPos, 1, 0, delay, lightningColor);
                             break;
                         case GT_LineVer:
                             gems[y][x]->destroy(delay);
                             
-                            SimpleAudioEngine::getInstance()->playEffect("laser.wav");
+                            //SimpleAudioEngine::getInstance()->playEffect("laser.wav");
                             
                             destroyLine(x, 0, x, kFieldHeight - 1, true, delay);
-                            
-                            lightningPos.y = (kFieldHeight * kTileSize) / 2.0f;
-                            
-                            applyLightningAtPosWithRotation(lightningPos, 0, delay);
+
+                            applyLightningAtPosWithXYDirectionsDelayAndColor(lightningPos, 0, 1, delay, lightningColor);
                             break;
                         case GT_RectDestroyer:
                             gems[y][x]->destroy();
@@ -591,17 +630,25 @@ void GemField::destroyRect(int originX, int originY, int width, int height) {
 #pragma mark - swapping stuff
 
 void GemField::swapGems(int fromX, int fromY, int toX, int toY) {
-	Gem *first;
-	Gem *second;
+	Gem *first = nullptr;
+	Gem *second = nullptr;
     
-	//Pointers for gems we will swap
+	// pointers for gems we will swap
 	first = gems[fromY][fromX];
 	second = gems[toY][toX];
     
     bool skipMatchLookup = false;
     
     // check super swaps here
-    if(first->getType() == GT_Hypercube || second->getType() == GT_Hypercube) {
+    if(first->getType() == GT_Hypercube && second->getType() == GT_Hypercube) {
+        skipMatchLookup = true;
+        
+        first->swapTo(toX, toY, false, GS_AboutToDestroyByHypercube);
+        second->swapTo(fromX, fromY, false, GS_AboutToDestroyByHypercube);
+        
+        state = FS_SwappingTwoHypercubes;
+        
+    } else if(first->getType() == GT_Hypercube || second->getType() == GT_Hypercube) {
         skipMatchLookup = true;
         
         Gem *hypercubeMaker = nullptr;
@@ -642,6 +689,9 @@ void GemField::swapGems(int fromX, int fromY, int toX, int toY) {
                 }
                 break;
             case GT_LineDestroyer:
+            case GT_Cross:
+            case GT_RectDestroyer:
+            case GT_Explosion:
                 state = FS_SwappingHypercubeWithFourInRowIcon;
                 
                 gem->swapTo(toX, toY, false, GS_AboutToTurnIntoBomb);
@@ -656,7 +706,8 @@ void GemField::swapGems(int fromX, int fromY, int toX, int toY) {
                 }
                 break;
         }
-    } else if(first->getType() == GT_LineDestroyer && second->getType() == GT_LineDestroyer) {
+    } else if((first->getType() == GT_LineDestroyer && second->getType() == GT_LineDestroyer) ||
+              (first->getType() == GT_Cross && second->getType() == GT_Cross)) {
         skipMatchLookup = true;
         state = FS_SwappingTwoFourInRowIcons;
         
@@ -885,30 +936,58 @@ void GemField::update(float dt) {
                     }
                 }
                 
-                auto applyLightning = [this](const Point &startPos, const Point &endPos, float delay) {
-                    Sprite *lightning = Sprite::createWithSpriteFrameName("lightning0.png");
-                    this->addChild(lightning, zGem - 1);
+                auto applyLightning = [this](const Point &startPos, const Point &endPos, float delay, GemColour color) {
+                    Point pt1 = endPos;
+                    Point pt2 = endPos;
                     
-                    Point yAxe = Point(0, 1);
-                    Point delta = endPos - startPos;
-                    float angle = yAxe.getAngle(delta);
-                    
-                    float scaleY = delta.getLength() / lightning->getContentSize().height;
-                    
-                    lightning->setAnchorPoint({0.5, 0.0});
-                    lightning->setPosition(startPos);
-                    lightning->setOpacity(150);
-                    lightning->setVisible(false);
-                    lightning->setScaleY(scaleY);
-                    lightning->setRotation(CC_RADIANS_TO_DEGREES(-angle));
-                    lightning->runAction(Sequence::create(DelayTime::create(delay),
-                                                          Show::create(),
-                                                          Animate::create(AnimationCache::getInstance()->animationByName("lightningSmall")),
-                                                          CallFunc::create([=](){
-                        lightning->removeFromParent();
-                    }), NULL));
+                    ccBezierConfig config = {endPos, pt1, pt2};
 
+                    Color3B lightningColor = {255, 255, 255};
+                    
+                    switch(color) {
+                        case GC_Red:
+                            lightningColor = {255, 50, 50};
+                            break;
+                        case GC_Green:
+                            lightningColor = {50, 255, 50};
+                            break;
+                        case GC_Blue:
+                            lightningColor = {50, 50, 255};
+                            break;
+                        case GC_Purple:
+                            lightningColor = {255, 50, 255};
+                            break;
+                        case GC_Orange:
+                            lightningColor = {255, 150, 0};
+                            break;
+                        case GC_Yellow:
+                            lightningColor = {255, 255, 0};
+                            break;
+                        case GC_White:
+                        case GC_Hypercube:
+                        case GC_Random:
+                            lightningColor = {255, 255, 255};
+                        default:
+                            break;
+                    }
+
+                    
+                    MotionStreak *streak = MotionStreak::create(delay * 0.45, 2, 25, lightningColor, "gems/lightningSquare.png");
+                    streak->setColor(lightningColor);
+                    streak->setPosition(startPos);
+                    
+                    this->addChild(streak, zGem - 1);
+                    
+                    streak->runAction(Sequence::create(DelayTime::create(delay * 0.2),
+                                                       BezierTo::create(delay * 0.45, config),
+                                                       DelayTime::create(delay *  0.4),
+                                                       CallFunc::create([=]() {
+                                                        streak->removeFromParent();
+                                                       }),
+                                                       NULL));
                 };
+                
+                int streakNumber = 0;
                 
                 for(int i = 0; i < kFieldHeight; ++i) {
                     for(int j = 0; j < kFieldWidth; ++j) {
@@ -916,11 +995,13 @@ void GemField::update(float dt) {
                         
                         if(fieldMask[i][j] == 1 && gem->getState() == GS_AboutToDestroyByHypercube) {
                             
-                            float delay = i * 0.02 + j * 0.03;
+                            float delay = 0.6;
                             this->destroyGem(j, i, delay);
                             // apply lightning
                             Point endPos = Gem::convertCoordinatesToPixels(j, i);
-                            applyLightning(hypercubeMaker->getPosition(), endPos, delay);
+                            applyLightning(hypercubeMaker->getPosition(), endPos, 0.7, gems[i][j]->getGemColour());
+                            
+                            streakNumber++;
                         }
                     }
                 }
@@ -981,6 +1062,87 @@ void GemField::update(float dt) {
             } break;
         case FS_DestroyingFourInRowIcons:
             if(!areGemsBeingMoved()) {
+                state = FS_Destroying;
+            }
+            break;
+        case FS_SwappingTwoHypercubes:
+            if(!areGemsBeingMoved()) {
+                // turn into plectrums
+                for(int i = 0; i < kFieldHeight; ++i) {
+                    for(int j = 0; j < kFieldWidth; ++j) {
+                        if(fieldMask[i][j] == 1 && gems[i][j]->getState() != GS_AboutToDestroyByHypercube) {
+                            //gems[i][j]->transformIntoPlectrum();
+                            // destroy something may be?
+                            
+                        }
+                    }
+                }
+                
+                state = FS_TwoHypercubesSwapped;
+            } break;
+        case FS_TwoHypercubesSwapped:
+            if(!areGemsBeingMoved()) {
+                
+                SpriteBatchNode *batch = SpriteBatchNode::create("gems/gems.png");
+                batch->setPosition({0, 0});
+                this->addChild(batch);
+                
+                auto applyLightningAtPosWithXYDirectionsDelayAndColor = [=](const Point &pos, int xDir, int yDir, float delay, Color3B lightningColor) {
+                    int squaresCount = MAX(kFieldHeight, kFieldWidth) * 2;
+                    
+                    Point currentIndices = {pos.x / kTileSize, kFieldHeight - pos.y / kTileSize};
+                    
+                    auto placeSprite = [=](const Point &index, float delay, Color3B color) {
+                        if(index.x >= kFieldWidth || index.x < 0 || index.y >= kFieldHeight || index.y < 0) {
+                            return;
+                        }
+                        
+                        Sprite *lightning = Sprite::createWithSpriteFrameName("lightningSquare.png");
+                        
+                        lightning->setOpacity(0);
+                        lightning->setColor(color);
+                        
+                        batch->addChild(lightning, zGem - 1);
+                        
+                        Point pos = Gem::convertCoordinatesToPixels(index.x, index.y);
+                        
+                        lightning->setPosition(pos);
+                        lightning->runAction(Sequence::create(DelayTime::create(delay * 0.4),
+                                                              FadeTo::create(0.1 * delay, 150),
+                                                              DelayTime::create(0.56 * delay),
+                                                              CallFunc::create([=](){
+                            lightning->removeFromParent();
+                        }), NULL));
+                        
+                    };
+                    
+                    for(int i = 0; i < squaresCount; ++i) {
+                        placeSprite({currentIndices.x + xDir * i, currentIndices.y + yDir * i}, delay + 0.03 * i, lightningColor);
+                        placeSprite({currentIndices.x - xDir * i, currentIndices.y - yDir * i}, delay + 0.03 * i, lightningColor);
+                    }
+                };
+                
+                float delay = 0.05;
+                
+                for(int i = 0; i < kFieldHeight; ++i) {
+                    for(int j = 0; j < kFieldWidth; ++j) {
+                        if(fieldMask[i][j] == 1) {
+                            this->destroyGem(j, i, 0.1 + delay * i);
+                        }
+                    }
+                }
+                
+                for(int i = 0; i < kFieldHeight; ++i) {
+                    applyLightningAtPosWithXYDirectionsDelayAndColor(Gem::convertCoordinatesToPixels(kFieldWidth / 2, i), 1, 0, delay * i,
+                                                                                    {255 * CCRANDOM_0_1(), 255 * CCRANDOM_0_1(), 255 * CCRANDOM_0_1()});
+                }
+
+                batch->runAction(Sequence::create(DelayTime::create(delay * kFieldWidth * kFieldHeight * 4),
+                                                  CallFunc::create([=]() {
+                                                        batch->removeFromParent();
+                                                  }),
+                                                  NULL));
+                
                 state = FS_Destroying;
             }
             break;
@@ -1206,15 +1368,19 @@ MoveList GemField::getMovesForLine(int fromX, int fromY, int toX, int toY) {
 	}
     
 	int currentValue = gems[y][x]->getGemColour();
+    GemType currentType = gems[y][x]->getType();
+    GemState currentState = gems[y][x]->getState();
+
 	int chainLength = 1;
     
 	x += stepX;
 	y += stepY;
     
-    
 	while(x <= toX + 1 && y <= toY + 1) {
         while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue) &&
-              !(gems[y][x]->getType() == GT_Hypercube && gems[y][x]->getState() != GS_Transformed)) {
+                  !(gems[y][x]->getType() == GT_Hypercube && gems[y][x]->getState() != GS_Transformed) &&
+                  !(currentType == GT_Hypercube && currentState != GS_Transformed)) {
+
             
 			x += stepX;
 			y += stepY;
@@ -1286,6 +1452,9 @@ MoveList GemField::getMovesForLine(int fromX, int fromY, int toX, int toY) {
 		}
         
 		currentValue = gems[y][x]->getGemColour();
+        currentType = gems[y][x]->getType();
+        currentState = gems[y][x]->getState();
+
 		chainLength = 1;
 		x += stepX;
 		y += stepY;

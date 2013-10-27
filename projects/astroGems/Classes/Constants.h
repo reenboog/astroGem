@@ -29,7 +29,7 @@
 
 #define kTransformationTime 0.2f
 
-#define kColumnsFallDelay 0.5
+#define kColumnsFallDelay 0.4
 #define kRowsFallDelay 0.3
 
 #define kSpawnBonuses 1
@@ -109,6 +109,8 @@ enum FieldState {
     FS_SwappingHypercubeWithFourInRowIcon,
     FS_TurningGemsToFourInRowIcons,
     FS_DestroyingFourInRowIcons,
+    FS_SwappingTwoHypercubes,
+    FS_TwoHypercubesSwapped,
 };
 
 struct Match {

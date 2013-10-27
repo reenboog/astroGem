@@ -80,6 +80,7 @@ public:
 
     // Overrides
     virtual void setPosition(const Point& position) override;
+    virtual const Point& getPosition() const {return _positionR;};
     virtual void draw() override;
     virtual void update(float delta) override;
     virtual Texture2D* getTexture() const override;

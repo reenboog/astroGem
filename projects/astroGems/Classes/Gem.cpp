@@ -147,15 +147,17 @@ void Gem::applyBonusStyling() {
             Sprite *backCloud = Sprite::createWithSpriteFrameName("gemCloudBack.png");
             backCloud->runAction(RepeatForever::create(RotateBy::create(1.0, -36.0f)));
             backCloud->setPosition(pos);
-            backCloud->setOpacity(50);
+            backCloud->setOpacity(20);
             backCloud->setTag(kGemBonusCloudBackSpriteTag);
             
             this->addChild(backCloud);
             this->reorderChild(backCloud, -1);
             
-            Sprite *front = Sprite::createWithSpriteFrameName("gemCloudFront.png");
-            front->setPosition(pos);
+            Node *front = Node::create();
+            front->setPosition({0, 0});
             front->setTag(kGemBonusCloudFrontSpriteTag);
+            
+            this->addChild(front);
             
             Sprite *innerFrontCloud = Sprite::createWithSpriteFrameName("gemCloudFront.png");
             innerFrontCloud->setAnchorPoint({0.5, 0.5});
@@ -171,26 +173,11 @@ void Gem::applyBonusStyling() {
                                                                               Spawn::create(FadeOut::create(0.2), NULL),
                                                                               ScaleTo::create(0.0001, 0.0),
                                                                               NULL)));
-            
-            this->addChild(front);
-            this->reorderChild(front, 1);
         } break;
         case GT_LineHor:
         case GT_LineVer:
         case GT_LineDestroyer: {
-            
-            Point pos = {this->getContentSize().width / 2.0f, this->getContentSize().height / 2.0f};
-            
-            Sprite *backCloud = Sprite::createWithSpriteFrameName("gemCloudBack.png");
-            backCloud->runAction(RepeatForever::create(RotateBy::create(1.0, 36.0f)));
-            backCloud->setPosition(pos);
-            backCloud->setOpacity(80);
-            backCloud->setTag(kGemBonusCloudBackSpriteTag);
-            
-            this->addChild(backCloud);
-            this->reorderChild(backCloud, -1);
-            
-            pos = Point(this->getContentSize().width * 0.4f, this->getContentSize().height * 0.6f);
+            Point pos = {this->getContentSize().width * 0.4f, this->getContentSize().height * 0.6f};
             
             Sprite *shine1 = Sprite::createWithSpriteFrameName("shine.png");
             shine1->runAction(RepeatForever::create(RotateBy::create(1.0, -36.0f)));
@@ -206,6 +193,7 @@ void Gem::applyBonusStyling() {
                                                                   Sequence::create(FadeOut::create(2),
                                                                                    DelayTime::create(1),
                                                                                    FadeIn::create(1), NULL), NULL)));
+            
             shine2->setPosition(pos);
             shine2->setOpacity(100);
             shine2->setScale(0.4);
