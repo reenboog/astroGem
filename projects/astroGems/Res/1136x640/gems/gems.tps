@@ -112,12 +112,19 @@
         </struct>
         <key>dataFileName</key>
         <filename>gems.plist</filename>
+        <key>multiPack</key>
+        <false/>
         <key>mainExtension</key>
         <string></string>
         <key>forceIdenticalLayout</key>
         <false/>
         <key>outputFormat</key>
         <enum type="SettingsBase::OutputFormat">RGBA8888</enum>
+        <key>contentProtection</key>
+        <struct type="ContentProtection">
+            <key>key</key>
+            <string></string>
+        </struct>
         <key>autoAliasEnabled</key>
         <true/>
         <key>trimSpriteNames</key>
@@ -135,7 +142,7 @@
             <key>trimThreshold</key>
             <uint>1</uint>
             <key>trimMode</key>
-            <enum type="SpriteSettings::TrimMode">Trim</enum>
+            <enum type="SpriteSettings::TrimMode">None</enum>
             <key>heuristicMask</key>
             <false/>
         </struct>
@@ -155,14 +162,13 @@
             <filename>yellow.png</filename>
             <filename>hyperCube.png</filename>
             <filename>shine.png</filename>
-            <filename>lightning0.png</filename>
-            <filename>lightning1.png</filename>
-            <filename>lightning2.png</filename>
-            <filename>lightning3.png</filename>
+            <filename>lightningSquare.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
         <key>replaceList</key>
+        <array/>
+        <key>ignoredWarnings</key>
         <array/>
         <key>commonDivisorX</key>
         <uint>1</uint>
