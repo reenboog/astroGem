@@ -18,7 +18,8 @@ GameScene::GameScene() {
     back = nullptr;
     
     currentScore = 0;
-    timeLeft = GameConfig::sharedInstance()->gameTimer;
+    currentRainbowGems = 0;
+    //timeLeft = GameConfig::sharedInstance()->gameTimer;
     scoreMultiplier = 1.0;
     scoreProgressFadeSpeed = 0;
     
@@ -103,19 +104,22 @@ bool GameScene::init() {
 
 void GameScene::reset() {
     currentScore = 0;
-    timeLeft = GameConfig::sharedInstance()->gameTimer;
+    //timeLeft = GameConfig::sharedInstance()->gameTimer;
     scoreMultiplier = 1.0;
     
     gameOver = false;
+    
+    currentRainbowGems = 0;
     
     scoreProgressFadeSpeed = kScoreMultiplierFadeInSpeed;
     
     ui->reset();
     
     ui->setScore(currentScore);
-    ui->setScoreMultiplier(scoreMultiplier);
+    ui->setRainbowGemsProgress(0);
+    //ui->setScoreMultiplier(scoreMultiplier);
     ui->setScoreMultiplierProgress(0);
-    ui->setTimeLeft(timeLeft);
+    //ui->setTimeLeft(timeLeft);
 }
 
 #pragma mark - field watcher delegate
@@ -181,6 +185,34 @@ void GameScene::onStartedResolvinMatches(const MatchList &founMatches) {
     SimpleAudioEngine::getInstance()->playEffect("match.wav", false, pitch, 0, 1);
 }
 
+void GameScene::onRainbowGemDestroyed(int x, int y) {
+    currentRainbowGems++;
+    
+    if(currentRainbowGems >= GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement) {
+        currentRainbowGems = GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement;
+        //GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement++;
+        
+        // show all the magic here;
+    }
+    
+    // apply visual effect here
+    Sprite *rainbow = Sprite::createWithSpriteFrameName("rainbow.png");
+    rainbow->setPosition(this->convertFieldCoordinatesToWorldLocation({x, y}));
+    
+    this->addChild(rainbow);
+    
+    rainbow->runAction(Sequence::create(Spawn::create(MoveBy::create(kRainbowGemDestructionEffectTime, {0, -kTileSize}),
+                                                      FadeOut::create(kRainbowGemDestructionEffectTime * 0.9),
+                                                      NULL),
+                                        CallFunc::create([=]() {
+                                            ui->setRainbowGemsProgress(100 * (currentRainbowGems / GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement));
+                                            field->setState(FS_Refilling);
+        
+                                            rainbow->removeFromParent();
+                                        }),
+                                        NULL));
+}
+
 void GameScene::onGemsStartedSwapping() {
 	canTouch = false;
 }
@@ -195,8 +227,8 @@ void GameScene::update(float dt) {
     scoreMultiplierProgress -= dt * scoreProgressFadeSpeed;
     setScoreMultiplierProgress(scoreMultiplierProgress);
     
-    timeLeft -= dt;
-    setTimeLeft(timeLeft);
+//    timeLeft -= dt;
+//    setTimeLeft(timeLeft);
 }
 
 #pragma mark - setters/getters
@@ -222,19 +254,19 @@ void GameScene::setScoreMultiplierProgress(float progress) {
         // turn effects on
     }
     
-    ui->setScoreMultiplier(scoreMultiplier);
-    ui->setScoreMultiplierProgress(scoreMultiplierProgress);
+    //ui->setScoreMultiplier(scoreMultiplier);
+    ui->setScoreMultiplierProgress(100 * (scoreMultiplierProgress / kScoreMultiplierMaxProgress));
 }
 
-void GameScene::setTimeLeft(float time) {
-    if(timeLeft <= 0) {
-        timeLeft = 0;
-        // game over
-        gameOver = true;
-    }
-    
-    ui->setTimeLeft(time);
-}
+//void GameScene::setTimeLeft(float time) {
+//    if(timeLeft <= 0) {
+//        timeLeft = 0;
+//        // game over
+//        gameOver = true;
+//    }
+//    
+//    ui->setTimeLeft(time);
+//}
 
 void GameScene::setScore(int score) {
     currentScore = score;

@@ -36,6 +36,8 @@ void GameConfig::load() {
     baseIconValue = kBaseIconValue;
     fourInRowIconValue = kFourInRowIconValue;
     hypercubeIconValue = kHypercubeIconValue;
+    
+    rainbowGemsRequiredForAchievement = kInitialRainbowGemsRequiredAchievement;
 }
 
 void GameConfig::save() {

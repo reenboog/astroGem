@@ -38,9 +38,11 @@ public:
 	virtual void onGemsFinishedMoving();
 	virtual void onMoveMade(bool legal);
     virtual void onStartedResolvinMatches(const MatchList &founMatches);
+
+    virtual void onRainbowGemDestroyed(int x, int y);
     
     void setScoreMultiplierProgress(float progress);
-    void setTimeLeft(float time);
+    //void setTimeLeft(float time);
     void setScore(int score);
     
     // some setters/getters
@@ -63,8 +65,10 @@ private:
     float scoreMultiplierProgress;
     float scoreProgressFadeSpeed;
     
-    float timeLeft;
+    //float timeLeft;
     int currentScore;
+    
+    int currentRainbowGems;
     
     Point firstTouchLocation;
 };

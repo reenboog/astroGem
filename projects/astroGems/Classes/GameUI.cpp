@@ -15,11 +15,13 @@ GameUI::~GameUI() {
 }
 
 GameUI::GameUI(): Layer() {
-    timeProgress = nullptr;
+    //timeProgress = nullptr;
+    rainbowGemsProgress = nullptr;
     multiplierProgress = nullptr;
-    timeLabel = nullptr;
+    //timeLabel = nullptr;
     pauseBtn = nullptr;
     scoreLabel = nullptr;
+    levelLabel = nullptr;
     
     gameLayer = nullptr;
 }
@@ -56,26 +58,42 @@ bool GameUI::init() {
     multiplierProgressMount->addChild(multiplierProgress);
     
     // time progress
-    Sprite *timeProgressMount = Sprite::create("timeProgressMount.png");
-    timeProgressMount->setAnchorPoint({0.5, 1});
-    timeProgressMount->setPosition({visibleSize.width / 2.0, gridPos.y - gridSize.height / 2.0});
+//    Sprite *timeProgressMount = Sprite::create("timeProgressMount.png");
+//    timeProgressMount->setAnchorPoint({0.5, 1});
+//    timeProgressMount->setPosition({visibleSize.width / 2.0, gridPos.y - gridSize.height / 2.0});
+//    
+//    this->addChild(timeProgressMount);
+//    
+//    timeProgress = ProgressTimer::create(Sprite::create("multiplierProgress.png"));
+//    timeProgress->setType(ProgressTimer::Type::BAR);
+//    timeProgress->setAnchorPoint({0, 0.5});
+//    timeProgress->setPosition({0, timeProgressMount->getContentSize().height / 2.0});
+//    timeProgress->setMidpoint({0, 0});
+//    timeProgress->setBarChangeRate({1, 0});
+//    timeProgress->setPercentage(30);
+//    
+//    timeProgressMount->addChild(timeProgress);
     
-    this->addChild(timeProgressMount);
+    Sprite *rainbowGemsProgressMount = Sprite::create("timeProgressMount.png");
+    rainbowGemsProgressMount->setAnchorPoint({0.5, 1});
+    rainbowGemsProgressMount->setPosition({visibleSize.width / 2.0, gridPos.y - gridSize.height / 2.0});
     
-    timeProgress = ProgressTimer::create(Sprite::create("multiplierProgress.png"));
-    timeProgress->setType(ProgressTimer::Type::BAR);
-    timeProgress->setAnchorPoint({0, 0.5});
-    timeProgress->setPosition({0, timeProgressMount->getContentSize().height / 2.0});
-    timeProgress->setMidpoint({0, 0});
-    timeProgress->setBarChangeRate({1, 0});
-    timeProgress->setPercentage(30);
+    this->addChild(rainbowGemsProgressMount);
     
-    timeProgressMount->addChild(timeProgress);
+    rainbowGemsProgress = ProgressTimer::create(Sprite::create("multiplierProgress.png"));
+    rainbowGemsProgress->setType(ProgressTimer::Type::BAR);
+    rainbowGemsProgress->setAnchorPoint({0, 0.5});
+    rainbowGemsProgress->setPosition({0, rainbowGemsProgressMount->getContentSize().height / 2.0});
+    rainbowGemsProgress->setMidpoint({0, 0});
+    rainbowGemsProgress->setBarChangeRate({1, 0});
+    rainbowGemsProgress->setPercentage(0);
+    
+    rainbowGemsProgressMount->addChild(rainbowGemsProgress);
     
     // time label
-    timeLabel = LabelBMFont::create("0", "time.fnt");
-    timeLabel->setPosition({timeProgress->getContentSize().width / 2.0, timeProgress->getContentSize().height / 2.0});
-    timeProgress->addChild(timeLabel);
+//    timeLabel = LabelBMFont::create("0", "time.fnt");
+//    timeLabel->setPosition({timeProgress->getContentSize().width / 2.0, timeProgress->getContentSize().height / 2.0});
+//    timeProgress->addChild(timeLabel);
     
     pauseBtn = MenuItemImage::create("pauseBtn.png", "pauseBtnOn.png", "pauseBtn.png", CC_CALLBACK_1(GameUI::onPauseBtnPressed, this));
     //pauseBtn->setAnchorPoint({0.5, 0.7});
@@ -85,6 +103,21 @@ bool GameUI::init() {
     pauseMenu->setPosition({pauseBtn->getContentSize().width * 0.8, visibleSize.height - pauseBtn->getContentSize().height * 0.8});
     
     this->addChild(pauseMenu);
+    
+    // level
+    levelLabel = LabelBMFont::create("12", "time.fnt");
+    levelLabel->setPosition({visibleSize.width * 0.98, gridPos.y + gridSize.height / 2.0 + multiplierProgressMount->getContentSize().height});
+    levelLabel->setAnchorPoint({1.0f, 0.0f});
+    
+    this->addChild(levelLabel);
+    
+    // score
+    
+    scoreLabel = LabelBMFont::create("110", "time.fnt");
+    scoreLabel->setPosition({visibleSize.width * 0.02, gridPos.y + gridSize.height / 2.0 + multiplierProgressMount->getContentSize().height});
+    scoreLabel->setAnchorPoint({0.0f, 0.0f});
+    
+    this->addChild(scoreLabel);
     
     return true;
 }
@@ -109,37 +142,53 @@ void GameUI::setScore(int value) {
     
     scoreStr.appendWithFormat("%i", value);
     
-//    scoreLabel->setString(scoreStr.getCString());
+    scoreLabel->setString(scoreStr.getCString());
 }
 
-void GameUI::setTimeLeft(float seconds) {
-    // format time here
-    String timeStr = "";
+void GameUI::setLevel(int value) {
+    String levelStr = "";
     
-    int min = seconds / 60;
-    int sec = (int)seconds % 60;
+    levelStr.appendWithFormat("%i", value);
     
-    if(min < 10) {
-        timeStr.appendWithFormat("0%i:", min);
-    } else {
-        timeStr.appendWithFormat("%i:", min);
-    }
-    
-    if(sec < 10) {
-        timeStr.appendWithFormat("0%i", sec);
-    } else {
-        timeStr.appendWithFormat("%i", sec);
-    }
-    
-    timeLabel->setString(timeStr.getCString());
-    
-    timeProgress->setPercentage(100 * seconds / GameConfig::sharedInstance()->gameTimer);
+    levelLabel->setString(levelStr.getCString());
 }
 
-void GameUI::setScoreMultiplier(float multiplier) {
-    
-}
+
+//void GameUI::setTimeLeft(float seconds) {
+//    // format time here
+//    String timeStr = "";
+//    
+//    int min = seconds / 60;
+//    int sec = (int)seconds % 60;
+//    
+//    if(min < 10) {
+//        timeStr.appendWithFormat("0%i:", min);
+//    } else {
+//        timeStr.appendWithFormat("%i:", min);
+//    }
+//    
+//    if(sec < 10) {
+//        timeStr.appendWithFormat("0%i", sec);
+//    } else {
+//        timeStr.appendWithFormat("%i", sec);
+//    }
+//    
+//    timeLabel->setString(timeStr.getCString());
+//    
+//    timeProgress->setPercentage(100 * seconds / GameConfig::sharedInstance()->gameTimer);
+//}
+
+//void GameUI::setScoreMultiplier(float multiplier) {
+//    
+//}
 
 void GameUI::setScoreMultiplierProgress(float progress) {
-    multiplierProgress->setPercentage(100 * progress / kScoreMultiplierMaxProgress);
+    multiplierProgress->stopAllActions();
+    multiplierProgress->runAction(ProgressTo::create(0.2, progress));
+}
+
+void GameUI::setRainbowGemsProgress(float progress) {
+    rainbowGemsProgress->stopAllActions();
+    
+    rainbowGemsProgress->runAction(ProgressTo::create(0.2, progress));
 }

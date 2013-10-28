@@ -30,14 +30,19 @@ public:
     void setGameLayer(GameScene *layer);
     
     void setScore(int value);
-    void setTimeLeft(float seconds);
-    void setScoreMultiplier(float multiplier);
+    void setLevel(int lv);
+    //void setTimeLeft(float seconds);
+    //void setScoreMultiplier(float multiplier);
     void setScoreMultiplierProgress(float progress);
+
+    void setRainbowGemsProgress(float progress);
 private:
-    ProgressTimer *timeProgress;
+    //ProgressTimer *timeProgress;
+    ProgressTimer *rainbowGemsProgress;
     ProgressTimer *multiplierProgress;
     LabelBMFont *scoreLabel;
-    LabelBMFont *timeLabel;
+    LabelBMFont *levelLabel;
+    //LabelBMFont *timeLabel;
     MenuItem *pauseBtn;
 
     GameScene *gameLayer;

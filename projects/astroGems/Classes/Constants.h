@@ -32,6 +32,8 @@
 #define kColumnsFallDelay 0.4
 #define kRowsFallDelay 0.3
 
+#define kRainbowGemDestructionEffectTime 0.4
+
 #define kSpawnBonuses 1
 
 #define kScoreMultiplierFadeOutSpeed 4
@@ -49,7 +51,8 @@ enum GemColour {
 	GC_Yellow,
     GC_Purple,
     GC_White,
-    GC_Hypercube
+    GC_Hypercube,
+    GC_Rainbow
 };
 
 enum GemState {
@@ -79,6 +82,7 @@ enum GemType {
     GT_RectDestroyer,
 	GT_Explosion,
     GT_Hypercube,
+    GT_Rainbow
 };
 
 enum Direction {
@@ -102,6 +106,7 @@ enum FieldState {
 	FS_Transforming,
 	FS_Destroying,
 	FS_Refilling,
+    FS_ApplyingRainbowGem,
 	FS_Shuffling,
     FS_SwappingHypercubeWithNormalIcon,
     FS_DestroyingNormalIconsAfterSwipe,

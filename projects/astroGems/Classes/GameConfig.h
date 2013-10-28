@@ -22,6 +22,8 @@ USING_NS_CC;
 #define kFourInRowIconValue 500
 #define kHypercubeIconValue 1000
 
+#define kInitialRainbowGemsRequiredAchievement 2
+
 class GameConfig {
 private:
     GameConfig();
@@ -40,6 +42,8 @@ public:
     float gameTimer;
     float quizTimer;
     float qMultiplier;
+    
+    float rainbowGemsRequiredForAchievement;
     
     float baseIconValue;
     float fourInRowIconValue;

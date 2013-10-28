@@ -36,7 +36,6 @@ struct Move {
 typedef std::list<Move> MoveList;
 
 class GemField: public Node {
-    
 public:
     // init
 	GemField();
@@ -48,9 +47,7 @@ public:
     // delegation stuff
 	void addWatcher(FieldWatcherDelegate *watcher);
     
-    // debug
-	void print();
-	void printMask();
+    void setState(FieldState state);
     
     void shuffleField(bool reset = true);
     

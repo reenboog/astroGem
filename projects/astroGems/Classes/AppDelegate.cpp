@@ -29,6 +29,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     FileUtils::getInstance()->addSearchPath("Res/1136x640");
     FileUtils::getInstance()->addSearchPath("Res/shared");
     FileUtils::getInstance()->addSearchPath("Res/shared/sounds");
+    FileUtils::getInstance()->addSearchPath("Res/fonts");
     FileUtils::getInstance()->addSearchPath("Res");
     
     // load game config

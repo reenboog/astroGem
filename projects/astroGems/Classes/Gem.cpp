@@ -101,6 +101,9 @@ void Gem::transformIntoBonus(GemType type, float delay, GemState completionState
             case GT_Hypercube:
                 setGemColour(GC_Hypercube);
                 break;
+            case GT_Rainbow:
+                setGemColour(GC_Rainbow);
+                break;
 			case GT_LineHor:
 			case GT_LineVer:
             case GT_LineDestroyer:
@@ -423,6 +426,7 @@ void Gem::setGemColour(GemColour color) {
 		case GC_Orange: fileName = "orange.png"; break;
         case GC_White: fileName = "white.png"; break;
         case GC_Hypercube: fileName = "hyperCube.png"; break;
+        case GC_Rainbow: fileName = "rainbow.png"; break;
             
         default: CCLOG("default gem color in reset!");
 	}
@@ -533,6 +537,8 @@ void Gem::destroy(float delay) {
 
 void Gem::remove() {
 	state = GS_Destroyed;
+    
+    this->setOpacity(0);
 }
 
 void Gem::setFreeze(int power) {

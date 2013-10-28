@@ -183,7 +183,7 @@ MatchList GemField::findMatchesInLine(int fromX, int fromY, int toX, int toY) {
 		return foundMatches;
 	}
     
-	int currentValue = gems[y][x]->getGemColour();
+	GemColour currentColor = gems[y][x]->getGemColour();
     GemType currentType = gems[y][x]->getType();
     GemState currentState = gems[y][x]->getState();
 	int chainLength = 1;
@@ -192,10 +192,11 @@ MatchList GemField::findMatchesInLine(int fromX, int fromY, int toX, int toY) {
 	y += stepY;
     
 	while(x <= toX && y <= toY) {
-		while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue) &&
+		while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentColor) &&
               !(gems[y][x]->getType() == GT_Hypercube && gems[y][x]->getState() != GS_Transformed) &&
-              !(currentType == GT_Hypercube && currentState != GS_Transformed)) {
-            
+              !(currentType == GT_Hypercube && currentState != GS_Transformed &&
+                currentType != GT_Rainbow && currentColor != GC_Rainbow &&
+                gems[y][x]->getType() != GT_Rainbow && gems[y][x]->getGemColour() != GC_Rainbow)) {
 			x += stepX;
 			y += stepY;
 			chainLength++;
@@ -221,7 +222,7 @@ MatchList GemField::findMatchesInLine(int fromX, int fromY, int toX, int toY) {
 			return foundMatches;
 		}
         
-		currentValue = gems[y][x]->getGemColour();
+		currentColor = gems[y][x]->getGemColour();
         currentType = gems[y][x]->getType();
         currentState = gems[y][x]->getState();
 
@@ -385,7 +386,7 @@ void GemField::destroyLine(int fromX, int fromY, int toX, int toY, bool destroyT
 }
 
 void GemField::destroyGem(int x, int y, float delay) {
-	if(fieldMask[y][x] == 1) {
+	if(fieldMask[y][x] == 1 && gems[y][x]->getType() != GT_Rainbow && gems[y][x]->getGemColour() != GC_Rainbow) {
         GemState gemState = gems[y][x]->getState();
         
 		if(gemState != GS_Destroying && gemState != GS_AboutToExplodeByHypercube) {
@@ -883,8 +884,14 @@ void GemField::update(float dt) {
 			if(!areGemsBeingMoved()) {
 				//CCLOG("-GP_Moving");
 				state = FS_Searching;
-			}
+                
+            }
 			break;
+        case FS_ApplyingRainbowGem:
+//            if(!areGemsBeingMoved()) {
+//                state = FS_Refilling;
+//            }
+            break;
 		case FS_Searching:
 			//CCLOG("-GP_Searching");
 			if(hasAnyMatches()) {
@@ -893,6 +900,64 @@ void GemField::update(float dt) {
 				state = FS_Transforming;
 			} else {
 				state = FS_Ready;
+                
+                bool isRainbowGemDestroyed = false;
+                
+                // first, check whether there's a rainbow gem and it is at the bottom of the grid
+                for(int j = 0; j < kFieldWidth; ++j) {
+                    if(fieldMask[kFieldHeight - 1][j] == 1 && gems[kFieldHeight - 1][j]->getGemColour() == GC_Rainbow) {
+                        isRainbowGemDestroyed = true;
+                        this->removeGem(j, kFieldHeight - 1);
+                        
+                        // apply any other temoral color
+                        gems[kFieldHeight - 1][j]->setGemColour(GC_Red);
+                        
+                        for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
+                            (*it)->onRainbowGemDestroyed(j, kFieldHeight - 1);
+                        }
+                        
+                        state = FS_ApplyingRainbowGem;
+
+                        break;
+                    }
+                }
+                
+                if(!isRainbowGemDestroyed) {
+                    // generate a new one if none found
+                    bool isThereAnyRainbowGemAlready = false;
+                    
+                    for(int i = 0; i < kFieldHeight; ++i) {
+                        for(int j = 0; j < kFieldWidth; ++j) {
+                            if(fieldMask[i][j] == 1 && gems[i][j]->getGemColour() == GC_Rainbow) {
+                                isThereAnyRainbowGemAlready = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if(!isThereAnyRainbowGemAlready && (CCRANDOM_0_1() * 10) > 6) {
+                        int rainbowGemX = MIN((CCRANDOM_0_1() + 0.3), 1) * (kFieldWidth - 1);
+                        int rainbowGemY = 0;
+                        
+                        if(fieldMask[rainbowGemY][rainbowGemX] != 1) {
+                            for(int i = 0; i < kFieldHeight; i++) {
+                                for(int j = 0; j < kFieldWidth; ++j) {
+                                    
+                                    // assume there's at least one valid cell
+                                    if(fieldMask[i][j] == 1) {
+                                        rainbowGemX = j;
+                                        rainbowGemY = i;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        gems[rainbowGemY][rainbowGemY]->transformIntoBonus(GT_Rainbow);
+                        
+                        state = FS_Transforming;
+                    }
+                }
 			}
 			break;
 		case FS_Transforming:
@@ -970,7 +1035,6 @@ void GemField::update(float dt) {
                         default:
                             break;
                     }
-
                     
                     MotionStreak *streak = MotionStreak::create(delay * 0.45, 2, 25, lightningColor, "gems/lightningSquare.png");
                     streak->setColor(lightningColor);
@@ -1367,7 +1431,7 @@ MoveList GemField::getMovesForLine(int fromX, int fromY, int toX, int toY) {
 		return availableMoves;
 	}
     
-	int currentValue = gems[y][x]->getGemColour();
+	GemColour currentColor = gems[y][x]->getGemColour();
     GemType currentType = gems[y][x]->getType();
     GemState currentState = gems[y][x]->getState();
 
@@ -1377,10 +1441,11 @@ MoveList GemField::getMovesForLine(int fromX, int fromY, int toX, int toY) {
 	y += stepY;
     
 	while(x <= toX + 1 && y <= toY + 1) {
-        while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentValue) &&
-                  !(gems[y][x]->getType() == GT_Hypercube && gems[y][x]->getState() != GS_Transformed) &&
-                  !(currentType == GT_Hypercube && currentState != GS_Transformed)) {
-
+        while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentColor) &&
+              !(gems[y][x]->getType() == GT_Hypercube && gems[y][x]->getState() != GS_Transformed) &&
+              !(currentType == GT_Hypercube && currentState != GS_Transformed &&
+                currentType != GT_Rainbow && currentColor != GC_Rainbow &&
+                gems[y][x]->getType() != GT_Rainbow && gems[y][x]->getGemColour() != GC_Rainbow)) {
             
 			x += stepX;
 			y += stepY;
@@ -1451,7 +1516,7 @@ MoveList GemField::getMovesForLine(int fromX, int fromY, int toX, int toY) {
 			return  availableMoves;
 		}
         
-		currentValue = gems[y][x]->getGemColour();
+		currentColor = gems[y][x]->getGemColour();
         currentType = gems[y][x]->getType();
         currentState = gems[y][x]->getState();
 
@@ -1536,20 +1601,6 @@ void GemField::addWatcher(FieldWatcherDelegate *watcher) {
 	watchers.push_front(watcher);
 }
 
-#pragma mark - debug
-
-void GemField::print() {
-	cocos2d::String* str = cocos2d::String::create("");
-	for(int y = 1; y <= kFieldHeight; y++) {
-		str->_string = "";
-		for(int x = 1; x <= kFieldWidth; x++) {
-			if(gems[y][x]->getState() == GS_Destroyed) {
-				str->appendWithFormat("%c ", "x");
-			} else {
-				str->appendWithFormat("%i ", gems[y][x]->getType());
-			}
-		}
-		CCLOG("%s", str->getCString());
-	}
-	CCLOG("\n----------------\n");
+void GemField::setState(FieldState state) {
+    this->state = state;
 }
