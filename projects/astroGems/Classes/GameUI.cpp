@@ -23,6 +23,8 @@ GameUI::GameUI(): Layer() {
     scoreLabel = nullptr;
     levelLabel = nullptr;
     coinsLabel = nullptr;
+    coinsMenu = nullptr;
+    coinsBtn = nullptr;
     
     gameLayer = nullptr;
 }
@@ -120,12 +122,25 @@ bool GameUI::init() {
     
     this->addChild(scoreLabel);
     
-    // coins
-    coinsLabel = LabelBMFont::create("999", "time.fnt");
-    coinsLabel->setPosition({100, 100});
-    coinsLabel->setAnchorPoint({0.0f, 1.0f});
+    // coins menu
+    coinsBtn = MenuItemImage::create("ui/coinsBtn.png", "ui/coinsBtnOn.png", CC_CALLBACK_0(GameUI::onCoinsBtnPressed, this));
+    coinsBtn->setAnchorPoint({0.0f, 1.0f});
+    //coinsBtn->setAnchorPoint({0.0f, 0.5f});
+    coinsBtn->setPosition({0, 0});
     
-    this->addChild(coinsLabel);
+    coinsMenu = Menu::create(coinsBtn, NULL);
+    coinsMenu->setPosition({visibleSize.width * 0.02, gridPos.y - gridSize.height / 2 - rainbowGemsProgressMount->getContentSize().height});
+    //coinsMenu->setPosition({visibleSize.width * 0.02, (visibleSize.height / 2 - (gridSize.height / 2 + rainbowGemsProgressMount->getContentSize().height)) * 0.5});
+    
+    this->addChild(coinsMenu);
+    
+    // coins label
+    coinsLabel = LabelBMFont::create("999", "time.fnt");
+    coinsLabel->setPosition({coinsBtn->getContentSize().width * 0.7, coinsBtn->getContentSize().height * 0.5});
+    coinsLabel->setAnchorPoint({1.0f, 0.5f});
+    coinsLabel->setScale(0.7);
+    
+    coinsBtn->addChild(coinsLabel);
     
     return true;
 }
@@ -162,11 +177,45 @@ void GameUI::setLevel(int value) {
 }
 
 
+void GameUI::setCoins(int coins, int fromX, int fromY) {
+    
+    
+    Point pos = {fromX, fromY};
+    Point endPos = coinsMenu->getPosition() + Point(coinsBtn->getContentSize().width * 0.2, -coinsBtn->getContentSize().height * 0.5);
+    
+    Sprite *coin = Sprite::createWithSpriteFrameName("coin.png");
+    coin->setPosition(pos);
+    
+    Point pt1 = {fromX + 100, fromX + 100};
+    Point pt2 = (pt1 + endPos) * 0.5;
+    
+    ccBezierConfig config = {endPos, pt1, pt2};
+    
+    MotionStreak *streak = MotionStreak::create(0.2, 2, 25, {255, 255, 255}, "gems/lightningSquare.png");
+    //streak->setColor(lightningColor);
+    streak->setPosition(pos);
+    
+    streak->runAction(EaseSineInOut::create(BezierTo::create(0.7, config)));
+    
+    this->addChild(streak);
+    this->addChild(coin);
+    
+    coin->runAction(Sequence::create(Spawn::create(EaseSineInOut::create(BezierTo::create(0.7, config)),
+                                                   Sequence::create(DelayTime::create(0.5),
+                                                                    FadeOut::create(0.2),
+                                                                    NULL),
+                                                   NULL),
+                                     CallFunc::create([=]() {
+                                            this->setCoins(coins);
+                                            coin->removeFromParent();
+                                            streak->removeFromParent();
+                                     }),
+                                     NULL));
+}
+
 void GameUI::setCoins(int coins) {
     String coinsStr = "";
-    
     coinsStr.appendWithFormat("%i", coins);
-    
     coinsLabel->setString(coinsStr.getCString());
 }
 
@@ -207,4 +256,8 @@ void GameUI::setRainbowGemsProgress(float progress) {
     rainbowGemsProgress->stopAllActions();
     
     rainbowGemsProgress->runAction(ProgressTo::create(0.2, progress));
+}
+
+void GameUI::onCoinsBtnPressed() {
+    
 }

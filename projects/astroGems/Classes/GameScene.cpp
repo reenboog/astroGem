@@ -134,7 +134,7 @@ void GameScene::onGemDestroyed(GemColour colour, int x, int y, int score) {
     }
     
     if(colour == GC_Coin) {
-        this->applyCoins(1);
+        this->applyCoins(1, x, y);
     }
 }
 
@@ -279,10 +279,12 @@ void GameScene::setScore(int score) {
     ui->setScore(currentScore);
 }
 
-void GameScene::applyCoins(int coins) {
+void GameScene::applyCoins(int coins, int fromX, int fromY) {    
     GameConfig::sharedInstance()->currentCoins += coins;
     
-    ui->setCoins(GameConfig::sharedInstance()->currentCoins);
+    Point pos = this->convertFieldCoordinatesToWorldLocation({fromX, fromY});
+    
+    ui->setCoins(GameConfig::sharedInstance()->currentCoins, pos.x, pos.y);
 }
 
 #pragma mark - touches

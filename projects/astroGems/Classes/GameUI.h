@@ -31,12 +31,15 @@ public:
     
     void setScore(int value);
     void setLevel(int lv);
+    void setCoins(int coins, int fromX, int fromY);
     void setCoins(int coins);
     //void setTimeLeft(float seconds);
     //void setScoreMultiplier(float multiplier);
     void setScoreMultiplierProgress(float progress);
 
     void setRainbowGemsProgress(float progress);
+    
+    void onCoinsBtnPressed();
 private:
     //ProgressTimer *timeProgress;
     ProgressTimer *rainbowGemsProgress;
@@ -44,6 +47,9 @@ private:
     LabelBMFont *scoreLabel;
     LabelBMFont *levelLabel;
     LabelBMFont *coinsLabel;
+    
+    Menu *coinsMenu;
+    MenuItemImage *coinsBtn;
     //LabelBMFont *timeLabel;
     MenuItem *pauseBtn;
 

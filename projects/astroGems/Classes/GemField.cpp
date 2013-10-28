@@ -799,7 +799,9 @@ void GemField::swipeAction(const Point &startCoordinates, int direction) {
 		if(selectedGemCoordinates != nullptr) {
 			deselectGem(selectedGemCoordinates->x, selectedGemCoordinates->y);
 		}
-		if(fieldMask[fromY][fromX] == 1 && freezeMask[fromY][fromX] == 0 && fieldMask[toY][toX] == 1  && freezeMask[toY][toX] == 0) {
+		if(fieldMask[fromY][fromX] == 1 && freezeMask[fromY][fromX] == 0 && fieldMask[toY][toX] == 1  && freezeMask[toY][toX] == 0 &&
+           !((gems[fromY][fromX]->getGemColour() == GC_Hypercube && gems[toY][toX]->getGemColour() == GC_Rainbow) ||
+             (gems[toY][toX]->getGemColour() == GC_Hypercube && gems[fromY][fromX]->getGemColour() == GC_Rainbow))) {
             Gem *first = gems[fromY][fromX];
             Gem *second = gems[toY][toX];
 
