@@ -206,7 +206,7 @@ void GameScene::onRainbowGemDestroyed(int x, int y) {
                                                       NULL),
                                         CallFunc::create([=]() {
                                             ui->setRainbowGemsProgress(100 * (currentRainbowGems / GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement));
-                                            field->setState(FS_Refilling);
+                                            field->setState(FS_Destroying);
         
                                             rainbow->removeFromParent();
                                         }),

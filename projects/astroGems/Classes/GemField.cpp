@@ -907,6 +907,7 @@ void GemField::update(float dt) {
                 for(int j = 0; j < kFieldWidth; ++j) {
                     if(fieldMask[kFieldHeight - 1][j] == 1 && gems[kFieldHeight - 1][j]->getGemColour() == GC_Rainbow) {
                         isRainbowGemDestroyed = true;
+
                         this->removeGem(j, kFieldHeight - 1);
                         
                         // apply any other temoral color
@@ -936,7 +937,7 @@ void GemField::update(float dt) {
                     }
                     
                     if(!isThereAnyRainbowGemAlready && (CCRANDOM_0_1() * 10) > 6) {
-                        int rainbowGemX = MIN((CCRANDOM_0_1() + 0.3), 1) * (kFieldWidth - 1);
+                        int rainbowGemX = clampf(CCRANDOM_0_1() * kFieldWidth, 3, kFieldWidth - 4);
                         int rainbowGemY = 0;
                         
                         if(fieldMask[rainbowGemY][rainbowGemX] != 1) {
@@ -953,7 +954,7 @@ void GemField::update(float dt) {
                             }
                         }
                         
-                        gems[rainbowGemY][rainbowGemY]->transformIntoBonus(GT_Rainbow);
+                        gems[rainbowGemY][rainbowGemX]->transformIntoBonus(GT_Rainbow);
                         
                         state = FS_Transforming;
                     }
