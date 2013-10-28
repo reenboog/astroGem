@@ -194,9 +194,10 @@ MatchList GemField::findMatchesInLine(int fromX, int fromY, int toX, int toY) {
 	while(x <= toX && y <= toY) {
 		while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentColor) &&
               !(gems[y][x]->getType() == GT_Hypercube && gems[y][x]->getState() != GS_Transformed) &&
-              !(currentType == GT_Hypercube && currentState != GS_Transformed &&
-                currentType != GT_Rainbow && currentColor != GC_Rainbow &&
-                gems[y][x]->getType() != GT_Rainbow && gems[y][x]->getGemColour() != GC_Rainbow)) {
+              !(currentType == GT_Hypercube && currentState != GS_Transformed) &&
+                currentType != GT_RainbowMaker && currentColor != GC_Rainbow &&
+                gems[y][x]->getType() != GT_RainbowMaker && gems[y][x]->getGemColour() != GC_Rainbow &&
+                currentColor != GC_Coin && gems[y][x]->getGemColour() != GC_Coin) {
 			x += stepX;
 			y += stepY;
 			chainLength++;
@@ -386,7 +387,7 @@ void GemField::destroyLine(int fromX, int fromY, int toX, int toY, bool destroyT
 }
 
 void GemField::destroyGem(int x, int y, float delay) {
-	if(fieldMask[y][x] == 1 && gems[y][x]->getType() != GT_Rainbow && gems[y][x]->getGemColour() != GC_Rainbow) {
+	if(fieldMask[y][x] == 1 && gems[y][x]->getType() != GT_RainbowMaker && gems[y][x]->getGemColour() != GC_Rainbow) {
         GemState gemState = gems[y][x]->getState();
         
 		if(gemState != GS_Destroying && gemState != GS_AboutToExplodeByHypercube) {
@@ -772,9 +773,8 @@ void GemField::swipeAction(const Point &startCoordinates, int direction) {
 	int toX = fromX;
 	int toY = fromY;
     
-	if(fromX >=0 && fromX < kFieldWidth && fromY >= 0 && fromY < kFieldHeight) {
-		switch (direction)
-		{
+	if(fromX >= 0 && fromX < kFieldWidth && fromY >= 0 && fromY < kFieldHeight) {
+		switch (direction) {
 			case D_Up:
 				if(fromY > 0) {
 					toY -= 1;
@@ -800,7 +800,22 @@ void GemField::swipeAction(const Point &startCoordinates, int direction) {
 			deselectGem(selectedGemCoordinates->x, selectedGemCoordinates->y);
 		}
 		if(fieldMask[fromY][fromX] == 1 && freezeMask[fromY][fromX] == 0 && fieldMask[toY][toX] == 1  && freezeMask[toY][toX] == 0) {
-			swapGems(fromX, fromY, toX, toY);
+            Gem *first = gems[fromY][fromX];
+            Gem *second = gems[toY][toX];
+
+            if(first->getGemColour() == GC_Coin || second->getGemColour() == GC_Coin) {
+                state = FS_Destroying;
+                
+                if(first->getGemColour() == GC_Coin) {
+                    destroyGem(fromX, fromY);
+                }
+                
+                if(second->getGemColour() == GC_Coin) {
+                    destroyGem(toX, toY);
+                }
+            } else {
+                swapGems(fromX, fromY, toX, toY);
+            }
 		}
 	}
 }
@@ -808,34 +823,45 @@ void GemField::swipeAction(const Point &startCoordinates, int direction) {
 void GemField::clickAction(const Point &clickCoordinates) {
 	int toX = clickCoordinates.x;
 	int toY = clickCoordinates.y;
+
 	if(toX >= 0 && toX < kFieldWidth && toY >= 0 && toY < kFieldHeight) {
-		if(fieldMask[toY][toX] == 1 && freezeMask[toY][toX] == 0)
-		{
+		if(fieldMask[toY][toX] == 1 && freezeMask[toY][toX] == 0) {
 			if(selectedGemCoordinates == nullptr) {
-				selectGem(toX, toY);
-				//CCLOG("Selected %i, %i", toX, toY);
+                if(gems[toY][toX]->getGemColour() == GC_Coin) {
+                    state = FS_Destroying;
+                    this->destroyGem(toX, toY);
+                } else {
+                    selectGem(toX, toY);
+                }
 			} else {
 				int selectedX = selectedGemCoordinates->x;
 				int selectedY = selectedGemCoordinates->y;
 				// Same gem
-				if(selectedGemCoordinates->getDistance(clickCoordinates) == 0)
-				{
-					//CCLOG("Deselected %f, %f", selectedGemCoordinates->x, selectedGemCoordinates->y);
+				if(selectedGemCoordinates->getDistance(clickCoordinates) == 0) {
 					deselectGem(selectedX, selectedY);
 				} else {
                     // Different gems
 					// Nearby gem
 					if(selectedGemCoordinates->getDistance(clickCoordinates) == 1) {
 						if(toX >= 0 && toX < kFieldWidth && toY >= 0 && toY < kFieldHeight) {
-							//CCLOG("Swap %f, %f with %f, %f", selectedGemCoordinates->x, selectedGemCoordinates->y, clickCoordinates.x, clickCoordinates.y);
 							deselectGem(selectedX, selectedY);
-							swapGems(selectedX, selectedY, toX, toY);
+                            
+                            if(gems[toY][toX]->getGemColour() == GC_Coin) {
+                                state = FS_Destroying;
+                                this->destroyGem(toX, toY);
+                            } else {
+                                swapGems(selectedX, selectedY, toX, toY);
+                            }
 						}
 					} else {
-                        // Faraway gem
-						//CCLOG("Deselected %f, %f - selected %f, %f", selectedGemCoordinates->x, selectedGemCoordinates->y, clickCoordinates.x, clickCoordinates.y);
 						deselectGem(selectedX, selectedY);
-						selectGem(toX, toY);
+                        
+                        if(gems[toY][toX]->getGemColour() == GC_Coin) {
+                            state = FS_Destroying;
+                            this->destroyGem(toX, toY);
+                        } else {
+                            selectGem(toX, toY);
+                        }
 					}
 				}
 			}
@@ -954,7 +980,7 @@ void GemField::update(float dt) {
                             }
                         }
                         
-                        gems[rainbowGemY][rainbowGemX]->transformIntoBonus(GT_Rainbow);
+                        gems[rainbowGemY][rainbowGemX]->transformIntoBonus(GT_RainbowMaker);
                         
                         state = FS_Transforming;
                     }
@@ -1444,9 +1470,9 @@ MoveList GemField::getMovesForLine(int fromX, int fromY, int toX, int toY) {
 	while(x <= toX + 1 && y <= toY + 1) {
         while((x <= toX && y <= toY) && fieldMask[y][x] == 1 && freezeMask[y][x] <= 1 && (gems[y][x]->getGemColour() == currentColor) &&
               !(gems[y][x]->getType() == GT_Hypercube && gems[y][x]->getState() != GS_Transformed) &&
-              !(currentType == GT_Hypercube && currentState != GS_Transformed &&
-                currentType != GT_Rainbow && currentColor != GC_Rainbow &&
-                gems[y][x]->getType() != GT_Rainbow && gems[y][x]->getGemColour() != GC_Rainbow)) {
+              !(currentType == GT_Hypercube && currentState != GS_Transformed) &&
+                currentType != GT_RainbowMaker && currentColor != GC_Rainbow &&
+                gems[y][x]->getType() != GT_RainbowMaker && gems[y][x]->getGemColour() != GC_Rainbow) {
             
 			x += stepX;
 			y += stepY;

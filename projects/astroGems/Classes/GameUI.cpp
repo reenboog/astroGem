@@ -22,6 +22,7 @@ GameUI::GameUI(): Layer() {
     pauseBtn = nullptr;
     scoreLabel = nullptr;
     levelLabel = nullptr;
+    coinsLabel = nullptr;
     
     gameLayer = nullptr;
 }
@@ -119,6 +120,13 @@ bool GameUI::init() {
     
     this->addChild(scoreLabel);
     
+    // coins
+    coinsLabel = LabelBMFont::create("999", "time.fnt");
+    coinsLabel->setPosition({100, 100});
+    coinsLabel->setAnchorPoint({0.0f, 1.0f});
+    
+    this->addChild(coinsLabel);
+    
     return true;
 }
 
@@ -153,6 +161,14 @@ void GameUI::setLevel(int value) {
     levelLabel->setString(levelStr.getCString());
 }
 
+
+void GameUI::setCoins(int coins) {
+    String coinsStr = "";
+    
+    coinsStr.appendWithFormat("%i", coins);
+    
+    coinsLabel->setString(coinsStr.getCString());
+}
 
 //void GameUI::setTimeLeft(float seconds) {
 //    // format time here

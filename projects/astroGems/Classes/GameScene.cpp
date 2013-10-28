@@ -117,6 +117,7 @@ void GameScene::reset() {
     
     ui->setScore(currentScore);
     ui->setRainbowGemsProgress(0);
+    ui->setCoins(GameConfig::sharedInstance()->currentCoins);
     //ui->setScoreMultiplier(scoreMultiplier);
     ui->setScoreMultiplierProgress(0);
     //ui->setTimeLeft(timeLeft);
@@ -130,6 +131,10 @@ void GameScene::onGemDestroyed(GemColour colour, int x, int y, int score) {
     
     if(scoreMultiplier == 1.0) {
         setScoreMultiplierProgress(scoreMultiplierProgress + 1);
+    }
+    
+    if(colour == GC_Coin) {
+        this->applyCoins(1);
     }
 }
 
@@ -272,6 +277,12 @@ void GameScene::setScore(int score) {
     currentScore = score;
     
     ui->setScore(currentScore);
+}
+
+void GameScene::applyCoins(int coins) {
+    GameConfig::sharedInstance()->currentCoins += coins;
+    
+    ui->setCoins(GameConfig::sharedInstance()->currentCoins);
 }
 
 #pragma mark - touches

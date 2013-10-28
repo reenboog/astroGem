@@ -7,7 +7,7 @@
 #define kFieldWidth 8
 #define kFieldHeight 9
 
-#define kGemTypeAmount 7
+#define kGemColorAmount 7
 
 #define kTileSize 80.0f
 #define kSwapTime 0.1f
@@ -52,7 +52,8 @@ enum GemColour {
     GC_Purple,
     GC_White,
     GC_Hypercube,
-    GC_Rainbow
+    GC_Rainbow,
+    GC_Coin
 };
 
 enum GemState {
@@ -82,7 +83,7 @@ enum GemType {
     GT_RectDestroyer,
 	GT_Explosion,
     GT_Hypercube,
-    GT_Rainbow
+    GT_RainbowMaker,
 };
 
 enum Direction {

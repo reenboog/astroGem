@@ -163,6 +163,7 @@
             <filename>hyperCube.png</filename>
             <filename>shine.png</filename>
             <filename>lightningSquare.png</filename>
+            <filename>coin.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

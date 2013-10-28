@@ -15,8 +15,6 @@ USING_NS_CC;
 
 #define kAppVersion         1
 #define kGameTimer          60
-#define kQuizTimer          5
-#define kQMultiplier        5
 
 #define kBaseIconValue      50
 #define kFourInRowIconValue 500
@@ -40,14 +38,14 @@ public:
     int version;
     
     float gameTimer;
-    float quizTimer;
-    float qMultiplier;
     
     float rainbowGemsRequiredForAchievement;
     
     float baseIconValue;
     float fourInRowIconValue;
     float hypercubeIconValue;
+    
+    int currentCoins;
     
     // required to align ui
     Point gridPos;

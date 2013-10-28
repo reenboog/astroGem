@@ -30,14 +30,14 @@ void GameConfig::load() {
     version = kAppVersion;
     
     gameTimer = kGameTimer;
-    quizTimer = kQuizTimer;
-    qMultiplier = kQMultiplier;
     
     baseIconValue = kBaseIconValue;
     fourInRowIconValue = kFourInRowIconValue;
     hypercubeIconValue = kHypercubeIconValue;
     
     rainbowGemsRequiredForAchievement = kInitialRainbowGemsRequiredAchievement;
+    
+    currentCoins = 0;
 }
 
 void GameConfig::save() {

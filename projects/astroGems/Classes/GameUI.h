@@ -31,6 +31,7 @@ public:
     
     void setScore(int value);
     void setLevel(int lv);
+    void setCoins(int coins);
     //void setTimeLeft(float seconds);
     //void setScoreMultiplier(float multiplier);
     void setScoreMultiplierProgress(float progress);
@@ -42,6 +43,7 @@ private:
     ProgressTimer *multiplierProgress;
     LabelBMFont *scoreLabel;
     LabelBMFont *levelLabel;
+    LabelBMFont *coinsLabel;
     //LabelBMFont *timeLabel;
     MenuItem *pauseBtn;
 

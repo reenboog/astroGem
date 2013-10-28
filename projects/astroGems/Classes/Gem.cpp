@@ -23,7 +23,7 @@ using std::string;
 Gem::Gem(GemColour colour, GemType type) {
 	// Generate a random gem type if it is not specified
 	if(colour == GC_Random) {
-		colour =  static_cast<GemColour>((int) ((CCRANDOM_0_1() * kGemTypeAmount) + 1));
+		colour =  static_cast<GemColour>((int) ((CCRANDOM_0_1() * kGemColorAmount) + 1));
 	}
 	
     this->colour = colour;
@@ -40,7 +40,7 @@ void Gem::init(int x, int y, GemColour colour, GemType type) {
 	string fileName = "";
 	int zOrder = zGem;
 	if(colour == GC_Random) {
-		colour =  static_cast<GemColour>((int) ((CCRANDOM_0_1() * kGemTypeAmount) + 1));
+		colour =  static_cast<GemColour>((int) ((CCRANDOM_0_1() * kGemColorAmount) + 1));
 	}
 
     this->colour = colour;
@@ -56,8 +56,13 @@ void Gem::init(int x, int y, GemColour colour, GemType type) {
 void Gem::reset(int x, int y, GemColour colour, GemType type) {
 	// Set parameters
 	if(colour == GC_Random) {
-		colour =  static_cast<GemColour>((int) ((CCRANDOM_0_1() * kGemTypeAmount) + 1));
+        if(CCRANDOM_0_1() * 10 > 9.5) {
+            colour = GC_Coin;
+        } else {
+            colour =  static_cast<GemColour>((int) ((CCRANDOM_0_1() * kGemColorAmount) + 1));
+        }
 	}
+    
 	this->colour = colour;
 	this->type = type;
 	this->state = GS_Idle;
@@ -101,7 +106,7 @@ void Gem::transformIntoBonus(GemType type, float delay, GemState completionState
             case GT_Hypercube:
                 setGemColour(GC_Hypercube);
                 break;
-            case GT_Rainbow:
+            case GT_RainbowMaker:
                 setGemColour(GC_Rainbow);
                 break;
 			case GT_LineHor:
@@ -427,6 +432,7 @@ void Gem::setGemColour(GemColour color) {
         case GC_White: fileName = "white.png"; break;
         case GC_Hypercube: fileName = "hyperCube.png"; break;
         case GC_Rainbow: fileName = "rainbow.png"; break;
+        case GC_Coin: fileName = "coin.png"; break;
             
         default: CCLOG("default gem color in reset!");
 	}

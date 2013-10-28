@@ -41,6 +41,8 @@ public:
 
     virtual void onRainbowGemDestroyed(int x, int y);
     
+    void applyCoins(int coins);
+    
     void setScoreMultiplierProgress(float progress);
     //void setTimeLeft(float time);
     void setScore(int score);
