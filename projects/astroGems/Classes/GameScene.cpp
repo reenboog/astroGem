@@ -23,7 +23,7 @@ GameScene::GameScene() {
     scoreMultiplier = 1.0;
     scoreProgressFadeSpeed = 0;
     
-    gameOver = true;
+    //gameOver = true;
 }
 
 #pragma mark - init/reset
@@ -54,9 +54,6 @@ bool GameScene::init() {
     
     // add sprite sheets
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gems.plist");
-
-    Shared::loadAnimation("animations.plist", "lightning");
-    Shared::loadAnimation("animations.plist", "lightningSmall");
     
     // preload effects and music
     SimpleAudioEngine::getInstance()->preloadEffect("match.wav");
@@ -107,7 +104,7 @@ void GameScene::reset() {
     //timeLeft = GameConfig::sharedInstance()->gameTimer;
     scoreMultiplier = 1.0;
     
-    gameOver = false;
+    //gameOver = false;
     
     currentRainbowGems = 0;
     
@@ -118,6 +115,7 @@ void GameScene::reset() {
     ui->setScore(currentScore);
     ui->setRainbowGemsProgress(0);
     ui->setCoins(GameConfig::sharedInstance()->currentCoins);
+    ui->setMakeFunBtnEnabled(false);
     //ui->setScoreMultiplier(scoreMultiplier);
     ui->setScoreMultiplierProgress(0);
     //ui->setTimeLeft(timeLeft);
@@ -164,6 +162,8 @@ void GameScene::onGemsToBeShuffled() {
 
 void GameScene::onGemsFinishedMoving() {
 	canTouch = true;
+    
+    ui->setMakeFunBtnEnabled(true);
 }
 
 void GameScene::onMoveMade(bool legal) {
@@ -220,20 +220,28 @@ void GameScene::onRainbowGemDestroyed(int x, int y) {
 
 void GameScene::onGemsStartedSwapping() {
 	canTouch = false;
+    
+    ui->setMakeFunBtnEnabled(false);
 }
 
 #pragma mark - update logic
 
 void GameScene::update(float dt) {
-    if(gameOver) {
-        return;
-    }
+//    if(gameOver) {
+//        return;
+//    }
     
     scoreMultiplierProgress -= dt * scoreProgressFadeSpeed;
     setScoreMultiplierProgress(scoreMultiplierProgress);
     
 //    timeLeft -= dt;
 //    setTimeLeft(timeLeft);
+}
+
+#pragma mark - callbacks
+
+void GameScene::onMakeFunBtnPressed() {
+    field->destroyEntireField();
 }
 
 #pragma mark - setters/getters

@@ -60,6 +60,8 @@ public:
 	void destroyStraightLine(int originX, int originY, bool isHorizontal, int length = -1);
 	void destroyCross(int originX, int originY, int length = -1);
 	void destroyRect(int originX, int originY, int width, int height);
+    
+    void destroyEntireField();
 	
 	MoveList getMoves();
 	void showTip();

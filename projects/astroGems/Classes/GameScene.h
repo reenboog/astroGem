@@ -41,14 +41,15 @@ public:
 
     virtual void onRainbowGemDestroyed(int x, int y);
     
-    void applyCoins(int coins, int fromX, int fromY);
-    
-    void setScoreMultiplierProgress(float progress);
     //void setTimeLeft(float time);
-    void setScore(int score);
+    
+    void onMakeFunBtnPressed();
     
     // some setters/getters
     void setUI(GameUI *ui);
+    void setScore(int score);
+    void setScoreMultiplierProgress(float progress);
+    void applyCoins(int coins, int fromX, int fromY);
     
     // update logic
     void update(float dt);
@@ -61,7 +62,7 @@ private:
     bool swipeEnded;
 	bool canTouch;
 
-    bool gameOver;
+    //bool gameOver;
     
     float scoreMultiplier;
     float scoreMultiplierProgress;

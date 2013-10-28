@@ -40,6 +40,9 @@ public:
     void setRainbowGemsProgress(float progress);
     
     void onCoinsBtnPressed();
+    void onMakeFunBtnPressed();
+    
+    void setMakeFunBtnEnabled(bool enabled);
 private:
     //ProgressTimer *timeProgress;
     ProgressTimer *rainbowGemsProgress;
@@ -50,6 +53,10 @@ private:
     
     Menu *coinsMenu;
     MenuItemImage *coinsBtn;
+    
+    Menu *makeFunMenu;
+    MenuItemImage *makeFunBtn;
+    LabelBMFont *makeFunLabel;
     //LabelBMFont *timeLabel;
     MenuItem *pauseBtn;
 

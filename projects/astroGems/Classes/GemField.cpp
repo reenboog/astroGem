@@ -521,6 +521,71 @@ void GemField::destroyGem(int x, int y, float delay) {
 	}
 }
 
+void GemField::destroyEntireField() {
+    SpriteBatchNode *batch = SpriteBatchNode::create("gems/gems.png");
+    batch->setPosition({0, 0});
+    this->addChild(batch);
+    
+    auto applyLightningAtPosWithXYDirectionsDelayAndColor = [=](const Point &pos, int xDir, int yDir, float delay, Color3B lightningColor) {
+        int squaresCount = MAX(kFieldHeight, kFieldWidth) * 2;
+        
+        Point currentIndices = {pos.x / kTileSize, kFieldHeight - pos.y / kTileSize};
+        
+        auto placeSprite = [=](const Point &index, float delay, Color3B color) {
+            if(index.x >= kFieldWidth || index.x < 0 || index.y >= kFieldHeight || index.y < 0) {
+                return;
+            }
+            
+            Sprite *lightning = Sprite::createWithSpriteFrameName("lightningSquare.png");
+            
+            lightning->setOpacity(0);
+            lightning->setColor(color);
+            
+            batch->addChild(lightning, zGem - 1);
+            
+            Point pos = Gem::convertCoordinatesToPixels(index.x, index.y);
+            
+            lightning->setPosition(pos);
+            lightning->runAction(Sequence::create(DelayTime::create(delay * 0.4),
+                                                  FadeTo::create(0.1 * delay, 150),
+                                                  DelayTime::create(0.56 * delay),
+                                                  CallFunc::create([=](){
+                lightning->removeFromParent();
+            }), NULL));
+            
+        };
+        
+        for(int i = 0; i < squaresCount; ++i) {
+            placeSprite({currentIndices.x + xDir * i, currentIndices.y + yDir * i}, delay + 0.03 * i, lightningColor);
+            placeSprite({currentIndices.x - xDir * i, currentIndices.y - yDir * i}, delay + 0.03 * i, lightningColor);
+        }
+    };
+    
+    float delay = 0.05;
+    
+    for(int i = 0; i < kFieldHeight; ++i) {
+        for(int j = 0; j < kFieldWidth; ++j) {
+            if(fieldMask[i][j] == 1) {
+                this->destroyGem(j, i, 0.1 + delay * i);
+            }
+        }
+    }
+    
+    for(int i = 0; i < kFieldHeight; ++i) {
+        applyLightningAtPosWithXYDirectionsDelayAndColor(Gem::convertCoordinatesToPixels(kFieldWidth / 2, i), 1, 0, delay * i,
+                                                         {255 * CCRANDOM_0_1(), 255 * CCRANDOM_0_1(), 255 * CCRANDOM_0_1()});
+    }
+    
+    batch->runAction(Sequence::create(DelayTime::create(delay * kFieldWidth * kFieldHeight * 4),
+                                      CallFunc::create([=]() {
+        batch->removeFromParent();
+    }),
+                                      NULL));
+    
+    state = FS_Destroying;
+
+}
+
 void GemField::removeGem(int x, int y) {
 	if(fieldMask[y][x] == 1) {
 		gems[y][x]->remove();
@@ -626,6 +691,7 @@ void GemField::destroyRect(int originX, int originY, int width, int height) {
 	for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
 		(*it)->onGemsStartedSwapping();
 	}
+
 	state = FS_Destroying;
 }
 
@@ -1175,68 +1241,7 @@ void GemField::update(float dt) {
             } break;
         case FS_TwoHypercubesSwapped:
             if(!areGemsBeingMoved()) {
-                
-                SpriteBatchNode *batch = SpriteBatchNode::create("gems/gems.png");
-                batch->setPosition({0, 0});
-                this->addChild(batch);
-                
-                auto applyLightningAtPosWithXYDirectionsDelayAndColor = [=](const Point &pos, int xDir, int yDir, float delay, Color3B lightningColor) {
-                    int squaresCount = MAX(kFieldHeight, kFieldWidth) * 2;
-                    
-                    Point currentIndices = {pos.x / kTileSize, kFieldHeight - pos.y / kTileSize};
-                    
-                    auto placeSprite = [=](const Point &index, float delay, Color3B color) {
-                        if(index.x >= kFieldWidth || index.x < 0 || index.y >= kFieldHeight || index.y < 0) {
-                            return;
-                        }
-                        
-                        Sprite *lightning = Sprite::createWithSpriteFrameName("lightningSquare.png");
-                        
-                        lightning->setOpacity(0);
-                        lightning->setColor(color);
-                        
-                        batch->addChild(lightning, zGem - 1);
-                        
-                        Point pos = Gem::convertCoordinatesToPixels(index.x, index.y);
-                        
-                        lightning->setPosition(pos);
-                        lightning->runAction(Sequence::create(DelayTime::create(delay * 0.4),
-                                                              FadeTo::create(0.1 * delay, 150),
-                                                              DelayTime::create(0.56 * delay),
-                                                              CallFunc::create([=](){
-                            lightning->removeFromParent();
-                        }), NULL));
-                        
-                    };
-                    
-                    for(int i = 0; i < squaresCount; ++i) {
-                        placeSprite({currentIndices.x + xDir * i, currentIndices.y + yDir * i}, delay + 0.03 * i, lightningColor);
-                        placeSprite({currentIndices.x - xDir * i, currentIndices.y - yDir * i}, delay + 0.03 * i, lightningColor);
-                    }
-                };
-                
-                float delay = 0.05;
-                
-                for(int i = 0; i < kFieldHeight; ++i) {
-                    for(int j = 0; j < kFieldWidth; ++j) {
-                        if(fieldMask[i][j] == 1) {
-                            this->destroyGem(j, i, 0.1 + delay * i);
-                        }
-                    }
-                }
-                
-                for(int i = 0; i < kFieldHeight; ++i) {
-                    applyLightningAtPosWithXYDirectionsDelayAndColor(Gem::convertCoordinatesToPixels(kFieldWidth / 2, i), 1, 0, delay * i,
-                                                                                    {255 * CCRANDOM_0_1(), 255 * CCRANDOM_0_1(), 255 * CCRANDOM_0_1()});
-                }
-
-                batch->runAction(Sequence::create(DelayTime::create(delay * kFieldWidth * kFieldHeight * 4),
-                                                  CallFunc::create([=]() {
-                                                        batch->removeFromParent();
-                                                  }),
-                                                  NULL));
-                
-                state = FS_Destroying;
+                this->destroyEntireField();
             }
             break;
 		default:

@@ -26,6 +26,10 @@ GameUI::GameUI(): Layer() {
     coinsMenu = nullptr;
     coinsBtn = nullptr;
     
+    makeFunMenu = nullptr;
+    makeFunBtn = nullptr;
+    makeFunLabel = nullptr;
+
     gameLayer = nullptr;
 }
 
@@ -142,6 +146,23 @@ bool GameUI::init() {
     
     coinsBtn->addChild(coinsLabel);
     
+    // make fun btn
+    makeFunBtn = MenuItemImage::create("ui/makeFunBtn.png", "ui/makeFunBtnOn.png", CC_CALLBACK_0(GameUI::onMakeFunBtnPressed, this));
+    makeFunBtn->setAnchorPoint({1.0f, 1.0f});
+    makeFunBtn->setPosition({0, 0});
+    
+    makeFunMenu = Menu::create(makeFunBtn, NULL);
+    makeFunMenu->setPosition({visibleSize.width * 0.98, gridPos.y - gridSize.height / 2 - rainbowGemsProgressMount->getContentSize().height});
+    
+    this->addChild(makeFunMenu);
+    
+    // makeFun label; add locals here
+    makeFunLabel = LabelBMFont::create("Make fun", "time.fnt");
+    makeFunLabel->setPosition({makeFunBtn->getContentSize().width * 0.5, makeFunBtn->getContentSize().height * 0.5});
+    makeFunLabel->setScale(0.7);
+    
+    makeFunBtn->addChild(makeFunLabel);
+
     return true;
 }
 
@@ -260,4 +281,13 @@ void GameUI::setRainbowGemsProgress(float progress) {
 
 void GameUI::onCoinsBtnPressed() {
     
+}
+
+void GameUI::onMakeFunBtnPressed() {
+    gameLayer->onMakeFunBtnPressed();
+    this->setMakeFunBtnEnabled(false);
+}
+
+void GameUI::setMakeFunBtnEnabled(bool enabled) {
+    makeFunBtn->setEnabled(enabled);
 }

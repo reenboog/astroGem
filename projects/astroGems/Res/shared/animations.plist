@@ -58,21 +58,5 @@
 		<key>delay</key>
 		<real>0.1</real>
 	</dict>
-	<key>lightning</key>
-	<dict>
-		<key>frames</key>
-		<string>0,1,2,3,2,1,0,1,2,3</string>
-		<key>delay</key>
-		<real>0.1</real>
-	</dict>
-	<key>lightningSmall</key>
-	<dict>
-		<key>frames</key>
-		<string>0,1,2</string>
-		<key>delay</key>
-		<real>0.1</real>
-		<key>baseFrameName</key>
-		<string>lightning</string>
-	</dict>
 </dict>
 </plist>
