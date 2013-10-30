@@ -20,8 +20,6 @@ GameScene::GameScene() {
     currentScore = 0;
     currentRainbowGems = 0;
     //timeLeft = GameConfig::sharedInstance()->gameTimer;
-    scoreMultiplier = 1.0;
-    scoreProgressFadeSpeed = 0;
     
     //gameOver = true;
 }
@@ -102,13 +100,12 @@ bool GameScene::init() {
 void GameScene::reset() {
     currentScore = 0;
     //timeLeft = GameConfig::sharedInstance()->gameTimer;
-    scoreMultiplier = 1.0;
     
     //gameOver = false;
     
     currentRainbowGems = 0;
     
-    scoreProgressFadeSpeed = kScoreMultiplierFadeInSpeed;
+    scoreMultiplier.rewind();
     
     ui->reset();
     
@@ -124,36 +121,19 @@ void GameScene::reset() {
 #pragma mark - field watcher delegate
 
 void GameScene::onGemDestroyed(GemColour colour, int x, int y, int score) {
-	// get is destroyed
-    setScore(currentScore + score * scoreMultiplier);
-    
-    if(scoreMultiplier == 1.0) {
-        setScoreMultiplierProgress(scoreMultiplierProgress + 1);
-    }
+    applyScoreMultiplierProgress(1);
     
     if(colour == GC_Coin) {
         this->applyCoins(1, x, y);
     }
+    
+    setScore(currentScore + score * scoreMultiplier.multiplier);
 }
 
 void GameScene::onGemsMatched(int length, GemColour colour, int startX, int startY, int endX, int endY, int score) {
-    float pitch = 1.0f;
-    
-	// on match
-    if(scoreMultiplier == 1.0) {
-        setScoreMultiplierProgress(scoreMultiplierProgress + length);
-        
-        pitch = clampf(1 + scoreMultiplierProgress / kScoreMultiplierMaxProgress - 0.34, 1, 1.3);
-    } else if(scoreMultiplier == 2.0) {
-        pitch = 1.2;
-    }
-    
-    // play some sound
-    // if length == 3
-    
-    //SimpleAudioEngine::getInstance()->playEffect("match.wav", false, pitch, 0, 1);
-    
-    setScore(currentScore + score * scoreMultiplier);
+    applyScoreMultiplierProgress(length);
+
+    setScore(currentScore + score * scoreMultiplier.multiplier);
 }
 
 void GameScene::onGemsToBeShuffled() {
@@ -168,26 +148,23 @@ void GameScene::onGemsFinishedMoving() {
 
 void GameScene::onMoveMade(bool legal) {
 	if(!legal) {
-		setScoreMultiplierProgress(scoreMultiplierProgress - 6);
-        
-        SimpleAudioEngine::getInstance()->playEffect("wrongMove.wav");
-	}
+        applyScoreMultiplierProgress(-6);
+    }
 }
 
 void GameScene::onStartedResolvinMatches(const MatchList &founMatches) {
     float pitch = 1;
 
-    if(scoreMultiplier == 1.0) {
-        
-        pitch = clampf(1 + scoreMultiplierProgress / kScoreMultiplierMaxProgress - 0.34, 1, 1.3);
-    } else if(scoreMultiplier == 2.0) {
+    if(scoreMultiplier.state == ScoreMultiplier::SMS_Normal) {
+        //pitch = clampf(1 + scoreMultiplier.currentProgress / kScoreMultiplierMaxProgress - 0.34, 1, 1.3);
+    } else if(scoreMultiplier.multiplier == kScoreExtraMultiplier) {
         pitch = 1.2;
     }
     
     // play some sound
     // if length == 3
     
-    SimpleAudioEngine::getInstance()->playEffect("match.wav", false, pitch, 0, 1);
+    //SimpleAudioEngine::getInstance()->playEffect("match.wav", false, pitch, 0, 1);
 }
 
 void GameScene::onRainbowGemDestroyed(int x, int y) {
@@ -231,8 +208,21 @@ void GameScene::update(float dt) {
 //        return;
 //    }
     
-    scoreMultiplierProgress -= dt * scoreProgressFadeSpeed;
-    setScoreMultiplierProgress(scoreMultiplierProgress);
+    switch(scoreMultiplier.state) {
+        case ScoreMultiplier::SMS_Active:
+            scoreMultiplier.activityTimer -= dt;
+            if(scoreMultiplier.activityTimer <= 0) {
+                scoreMultiplier.activityTimer = 0;
+                scoreMultiplier.fadeOut();
+            }
+            break;
+        case ScoreMultiplier::SMS_FadingOut:
+            this->applyScoreMultiplierProgress(-dt * kScoreMultiplierFadeOutSpeed);
+            break;
+        case ScoreMultiplier::SMS_Normal:
+            this->applyScoreMultiplierProgress(-dt * kScoreMultiplierFadeInSpeed);
+            break;
+    }
     
 //    timeLeft -= dt;
 //    setTimeLeft(timeLeft);
@@ -250,25 +240,39 @@ void GameScene::setUI(GameUI *ui) {
     this->ui = ui;
 }
 
-void GameScene::setScoreMultiplierProgress(float progress) {
-    scoreMultiplierProgress = progress;
-    
-    if(scoreMultiplierProgress <= 0) {
-        scoreMultiplierProgress = 0;
-        scoreMultiplier = 1.0;
-        
-        scoreProgressFadeSpeed = kScoreMultiplierFadeInSpeed;
-        // turn effects off
-    } else if(scoreMultiplierProgress >= kScoreMultiplierMaxProgress) {
-        scoreMultiplierProgress = kScoreMultiplierMaxProgress;
-        scoreMultiplier = 2.0;
-        
-        scoreProgressFadeSpeed = kScoreMultiplierFadeOutSpeed;
-        // turn effects on
+void GameScene::applyScoreMultiplierProgress(float progress) {
+    switch(scoreMultiplier.state) {
+        case ScoreMultiplier::SMS_Active:
+            break;
+        case ScoreMultiplier::SMS_FadingOut:
+            if(progress < 0) {
+                scoreMultiplier.currentProgress += progress;
+                if(scoreMultiplier.currentProgress <= 0) {
+                    scoreMultiplier.currentProgress = 0;
+                    scoreMultiplier.rewind();
+                }
+            }
+            
+            this->setScoreMultiplierProgress(scoreMultiplier.currentProgress);
+            break;
+        case ScoreMultiplier::SMS_Normal:
+            scoreMultiplier.currentProgress += progress;
+            
+            if(scoreMultiplier.currentProgress >= kScoreMultiplierMaxProgress) {
+                scoreMultiplier.currentProgress = kScoreMultiplierMaxProgress;
+                scoreMultiplier.apply();
+            } else if(scoreMultiplier.currentProgress < 0) {
+                scoreMultiplier.currentProgress = 0;
+            }
+            
+            this->setScoreMultiplierProgress(scoreMultiplier.currentProgress);
+            break;
     }
-    
-    //ui->setScoreMultiplier(scoreMultiplier);
-    ui->setScoreMultiplierProgress(100 * (scoreMultiplierProgress / kScoreMultiplierMaxProgress));
+}
+
+void GameScene::setScoreMultiplierProgress(float progress) {
+    scoreMultiplier.currentProgress = progress;
+    ui->setScoreMultiplierProgress(100 * (scoreMultiplier.currentProgress / kScoreMultiplierMaxProgress));
 }
 
 //void GameScene::setTimeLeft(float time) {

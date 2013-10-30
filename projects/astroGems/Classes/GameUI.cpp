@@ -31,6 +31,9 @@ GameUI::GameUI(): Layer() {
     makeFunLabel = nullptr;
 
     gameLayer = nullptr;
+    
+    // forgive me for this (
+    currentScoreMultiplierProgress = 0.0f;
 }
 
 #pragma mark - init
@@ -60,7 +63,7 @@ bool GameUI::init() {
     multiplierProgress->setPosition({0, multiplierProgressMount->getContentSize().height / 2.0});
     multiplierProgress->setMidpoint({0, 0});
     multiplierProgress->setBarChangeRate({1, 0});
-    multiplierProgress->setPercentage(30);
+    multiplierProgress->setPercentage(0);
     
     multiplierProgressMount->addChild(multiplierProgress);
     
@@ -167,6 +170,7 @@ bool GameUI::init() {
 }
 
 void GameUI::reset() {
+    currentScoreMultiplierProgress = 0.0;
 }
 
 #pragma mark - callbacks
@@ -270,7 +274,9 @@ void GameUI::setCoins(int coins) {
 
 void GameUI::setScoreMultiplierProgress(float progress) {
     multiplierProgress->stopAllActions();
-    multiplierProgress->runAction(ProgressTo::create(0.2, progress));
+    multiplierProgress->runAction(ProgressFromTo::create(0.2, currentScoreMultiplierProgress, progress));
+    
+    currentScoreMultiplierProgress = progress;
 }
 
 void GameUI::setRainbowGemsProgress(float progress) {

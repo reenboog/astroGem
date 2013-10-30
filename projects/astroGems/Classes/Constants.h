@@ -25,6 +25,9 @@
 #define zLighting 90
 #define zMatchScore 100
 
+#define kScoreExtraMultiplier 2
+#define kScoreMultiplierActiveTime 5
+
 #define kTipDelay 1.f
 
 #define kTransformationTime 0.2f
@@ -38,7 +41,7 @@
 
 #define kScoreMultiplierFadeOutSpeed 4
 #define kScoreMultiplierFadeInSpeed 2
-#define kScoreMultiplierMaxProgress 20
+#define kScoreMultiplierMaxProgress 10
 
 const bool kPreloadField = false;
 

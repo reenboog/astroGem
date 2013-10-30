@@ -48,7 +48,9 @@ public:
     // some setters/getters
     void setUI(GameUI *ui);
     void setScore(int score);
+    void applyScoreMultiplierProgress(float progress);
     void setScoreMultiplierProgress(float progress);
+        
     void applyCoins(int coins, int fromX, int fromY);
     
     // update logic
@@ -63,14 +65,43 @@ private:
 	bool canTouch;
 
     //bool gameOver;
-    
-    float scoreMultiplier;
-    float scoreMultiplierProgress;
-    float scoreProgressFadeSpeed;
-    
     //float timeLeft;
-    int currentScore;
     
+    // score multiplier stuff
+    struct ScoreMultiplier {
+        enum ScoreMultiplierState {
+            SMS_Normal,
+            SMS_Active,
+            SMS_FadingOut
+        
+        } state;
+        
+        ScoreMultiplier(): multiplier(0), currentProgress(0), activityTimer(0), state(SMS_Normal) {}
+        
+        void fadeOut() {
+            activityTimer = 0.0f;
+            state = SMS_FadingOut;
+            multiplier = 1.0f;
+        }
+        
+        void rewind() {
+            activityTimer = 0;
+            state = SMS_Normal;
+            multiplier = 1.0f;
+        }
+        
+        void apply() {
+            multiplier = kScoreExtraMultiplier;
+            state = SMS_Active;
+            activityTimer = kScoreMultiplierActiveTime;
+        }
+        
+        float multiplier;
+        float currentProgress;
+        float activityTimer;
+    } scoreMultiplier;
+
+    int currentScore;
     int currentRainbowGems;
     
     Point firstTouchLocation;

@@ -61,6 +61,8 @@ private:
     MenuItem *pauseBtn;
 
     GameScene *gameLayer;
+    
+    float currentScoreMultiplierProgress;
 };
 
 #endif /* defined(__astroGems__GameUI__) */
