@@ -231,6 +231,7 @@ void GameScene::update(float dt) {
 #pragma mark - callbacks
 
 void GameScene::onMakeFunBtnPressed() {
+    canTouch = false;
     field->destroyEntireField();
 }
 

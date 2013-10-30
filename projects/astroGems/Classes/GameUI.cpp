@@ -274,7 +274,7 @@ void GameUI::setCoins(int coins) {
 
 void GameUI::setScoreMultiplierProgress(float progress) {
     multiplierProgress->stopAllActions();
-    multiplierProgress->runAction(ProgressFromTo::create(0.2, currentScoreMultiplierProgress, progress));
+    multiplierProgress->runAction(ProgressFromTo::create(0.5, currentScoreMultiplierProgress, progress));
     
     currentScoreMultiplierProgress = progress;
 }

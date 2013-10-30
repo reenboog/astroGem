@@ -40,8 +40,8 @@
 #define kSpawnBonuses 1
 
 #define kScoreMultiplierFadeOutSpeed 4
-#define kScoreMultiplierFadeInSpeed 2
-#define kScoreMultiplierMaxProgress 10
+#define kScoreMultiplierFadeInSpeed 0.3
+#define kScoreMultiplierMaxProgress 20
 
 const bool kPreloadField = false;
 
