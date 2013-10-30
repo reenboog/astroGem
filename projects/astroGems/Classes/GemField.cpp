@@ -968,7 +968,7 @@ void GemField::update(float dt) {
 				resetGemsState();
 				state = FS_Waiting;
 			} else {
-				shuffleField(true);
+				shuffleField(false);
 				for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
 					(*it)->onGemsToBeShuffled();
 				}
@@ -1257,15 +1257,32 @@ void GemField::shuffleField(bool reset) {
 	if(reset) {
 		resetField();
 	} else {
-		for(int x = 0; x < kFieldWidth; x++) {
+        std::vector<Gem *> unusedGems;
+        
+        for(int x = 0; x < kFieldWidth; x++) {
 			for(int y = kFieldHeight - 1; y >= 0; y--) {
 				if(fieldMask[y][x] == 1) {
-					gems[y][x]->reset(x, y, gems[y][x]->getGemColour(), gems[y][x]->getType());
-					removeGem(x, y);
+					unusedGems.push_back(gems[y][x]);
+				}
+			}
+		}
+        
+        for(int x = 0; x < kFieldWidth; x++) {
+			for(int y = kFieldHeight - 1; y >= 0; y--) {
+				if(fieldMask[y][x] == 1) {
+                    
+                    int unusedGemIndex = rand() % unusedGems.size();
+					gems[y][x] = unusedGems[unusedGemIndex];
+                    gems[y][x]->reset(x, y, gems[y][x]->getGemColour(), gems[y][x]->getType());
+                    
+                    removeGem(x, y);
+                    
+                    unusedGems.erase(unusedGems.begin() + unusedGemIndex);
 				}
 			}
 		}
 	}
+    
 	refillField(false);
 }
 
