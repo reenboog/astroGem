@@ -3,7 +3,11 @@
 #include "GameScene.h"
 #include "GameConfig.h"
 
+#include "Localized.h"
+
 USING_NS_CC;
+
+using namespace std;
 
 AppDelegate::AppDelegate() {
 
@@ -11,6 +15,7 @@ AppDelegate::AppDelegate() {
 
 AppDelegate::~AppDelegate() {
     delete GameConfig::sharedInstance();
+    Localized::purge();
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
@@ -26,11 +31,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
     
-    FileUtils::getInstance()->addSearchPath("Res/1136x640");
-    FileUtils::getInstance()->addSearchPath("Res/shared");
-    FileUtils::getInstance()->addSearchPath("Res/shared/sounds");
-    FileUtils::getInstance()->addSearchPath("Res/fonts");
-    FileUtils::getInstance()->addSearchPath("Res");
+    // load localized strings
+    Localized::load();
     
     // load game config
     GameConfig::sharedInstance()->load();

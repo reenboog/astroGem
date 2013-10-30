@@ -43,3 +43,41 @@ Animation* Shared::loadAnimation(string file, string name) {
     
     return animation;
 }
+
+string Shared::languageShortNameForType(cocos2d::LanguageType type) {
+    string languagePrefix = "unknown";
+    switch(type) {
+        case LanguageType::ENGLISH:
+            languagePrefix = "en"; break;
+        case LanguageType::CHINESE:
+            languagePrefix = "zh"; break;
+        case LanguageType::FRENCH:
+            languagePrefix = "fr"; break;
+        case LanguageType::ITALIAN:
+            languagePrefix = "it"; break;
+        case LanguageType::GERMAN:
+            languagePrefix = "de"; break;
+        case LanguageType::SPANISH:
+            languagePrefix = "es"; break;
+        case LanguageType::RUSSIAN:
+            languagePrefix = "ru"; break;
+        case LanguageType::KOREAN:
+            languagePrefix = "ko"; break;
+        case LanguageType::JAPANESE:
+            languagePrefix = "ja"; break;
+        case LanguageType::HUNGARIAN:
+            languagePrefix = "hu"; break;
+        case LanguageType::PORTUGUESE:
+            languagePrefix = "pt"; break;
+        case LanguageType::ARABIC:
+            languagePrefix = "ar"; break;
+        case LanguageType::NORWEGIAN:
+            languagePrefix = "nb"; break;
+        case LanguageType::POLISH:
+            languagePrefix = "pl"; break;
+        default:
+            break;
+    }
+
+    return languagePrefix;
+}

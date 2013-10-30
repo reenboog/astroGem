@@ -1,0 +1,762 @@
+{
+    "version": 3,
+    "clearDefaults": false,
+    "clearPlayer": true,
+    "clearWorld": true,
+	"discount": {
+		"discountActive": true,
+		"discountPercentage": 50,
+		"numberOfEquipment": 1,
+		"numberOfSpells": 1,
+		"numberOfConsumables": 2,
+		"discountJewels": true
+	},
+    "gameValues": {
+        "startingMaxHealth": 100,
+        "startingMaxMana": 100,
+        "startingMaxArmour": 50,
+        "startingAttack": 100,
+        "healthPerMatch": 0.01,
+        "manaPerMatch": 0.02,
+        "armourPerMatch": 0.02,
+        "attackPerMatch": 0.06,
+        "criticalDamage": 1.5,
+        "healthPerPoint": 10,
+        "manaPerPoint": 10,
+        "armourPerPoint": 10,
+        "attackPerPoint": 10,
+        "pointsPerLevel": 5,
+        "moneyPerMatch": 2,
+        "expPerMatch": 1
+    },
+	"gemProbabilities": [
+		0.1,
+		0.2,
+		0.1,
+		0.1,
+		0.2,
+		0.15,
+		0.15
+	],
+    "rewardChances": [
+        0.4,
+        0.1,
+        0.1,
+        0.4
+    ],
+    "templates": [
+        [
+            0.7,
+            0.1,
+            0.1,
+            0.1
+        ],
+        [
+            0.5,
+            0.3,
+            0.1,
+            0.1
+        ],
+        [
+            0.4,
+            0.4,
+            0.1,
+            0.1
+        ],
+        [
+            0.3,
+            0.3,
+            0.3,
+            0.1
+        ],
+        [
+            0.25,
+            0.25,
+            0.25,
+            0.25
+        ]
+    ],
+    "enemyLevelProgression": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        4,
+        4,
+        6
+    ],
+    "branchChance": 0.25,
+    "branchEnemyLevel": 10,
+    "playerConfig": {
+        "name": "Player config",
+        "level": 10,
+        "attributes": {
+            "healthMax": 150,
+            "manaMax": 150,
+            "armourMax": 150,
+            "attack": 150,
+            "mana": 150
+        },
+        "items": [
+            2
+        ]
+    },
+    "equipment": [
+        {
+            "id": 1,
+            "name": "Small helmet",
+            "description": "Helmet",
+            "slot": "head",
+            "cost": 300,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "armourMax": 10
+            },
+            "baseAttribute": "armour",
+            "lvlMin": 0,
+            "lvlMax": 10
+        },
+        {
+            "id": 2,
+            "name": "Light helmet",
+            "description": "Helmet",
+            "slot": "head",
+            "cost": 500,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "armourPerMatch": 0.01
+            },
+            "baseAttribute": "armour",
+            "lvlMin": 0,
+            "lvlMax": 10
+        },
+        {
+            "id": 3,
+            "name": "Angry helmet",
+            "description": "Helmet",
+            "slot": "head",
+            "cost": 750,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "attack": 30
+            },
+            "baseAttribute": "attack",
+            "lvlMin": 10,
+            "lvlMax": 20
+        },
+        {
+            "id": 4,
+            "name": "Full helmet",
+            "description": "Helmet",
+            "slot": "head",
+            "cost": 800,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "armourMax": 50
+            },
+            "baseAttribute": "armour",
+            "lvlMin": 10,
+            "lvlMax": 20
+        },
+        {
+            "id": 5,
+            "name": "Horned helmet",
+            "description": "Helmet",
+            "slot": "head",
+            "cost": 1250,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "criticalChance": 0.1
+            },
+            "baseAttribute": "attack",
+            "lvlMin": 20,
+            "lvlMax": 30
+        },
+        {
+            "id": 6,
+            "name": "Mind reading helmet",
+            "description": "Helmet",
+            "slot": "head",
+            "cost": 50,
+            "currency": "jewels",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "manaLeech": 0.5
+            },
+            "baseAttribute": "mana",
+            "lvlMin": 20,
+            "lvlMax": 30
+        },
+		{
+            "id": 7,
+            "name": "OLLD T-Shirt",
+            "description": "Body",
+            "slot": "body",
+            "cost": 10,
+            "currency": "jewels",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "healthMax": 15
+            },
+            "baseAttribute": "health",
+            "lvlMin": 0,
+            "lvlMax": 10
+        },
+        {
+            "id": 8,
+            "name": "Leather armour",
+            "description": "Body",
+            "slot": "body",
+            "cost": 300,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "armourMax": 10,
+                "armour": 10
+            },
+            "baseAttribute": "armour",
+            "lvlMin": 0,
+            "lvlMax": 10
+        },
+        {
+            "id": 9,
+            "name": "Bronze cuirass",
+            "description": "Body",
+            "slot": "body",
+            "cost": 620,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "armourMax": 35,
+                "armourPerMatch": 0.01
+            },
+            "baseAttribute": "armour",
+            "lvlMin": 10,
+            "lvlMax": 20
+        },
+        {
+            "id": 10,
+            "name": "Mantle of apprentice",
+            "description": "Body",
+            "slot": "body",
+            "cost": 800,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "manaRegen": 1
+            },
+            "baseAttribute": "mana",
+            "lvlMin": 10,
+            "lvlMax": 20
+        },
+        {
+            "id": 11,
+            "name": "Hungry plating",
+            "description": "Body",
+            "slot": "body",
+            "cost": 50,
+            "currency": "jewels",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "armourMax": 100,
+                "armourLeech": 0.25
+            },
+            "baseAttribute": "armour",
+            "lvlMin": 20,
+            "lvlMax": 30
+        },
+		{
+            "id": 12,
+            "name": "Cloak with dagger",
+            "description": "Body",
+            "slot": "body",
+            "cost": 1100,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "dodgeChance": 0.1,
+                "criticalChance": 0.15
+            },
+            "baseAttribute": "attack",
+            "lvlMin": 20,
+            "lvlMax": 30
+        },
+		{
+            "id": 13,
+            "name": "Club",
+            "description": "Weapon",
+            "slot": "weapon",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "attack": 15
+            },
+            "baseAttribute": "attack",
+            "lvlMin": 0,
+            "lvlMax": 10
+        },
+        {
+            "id": 14,
+            "name": "Dagger",
+            "description": "Weapon",
+            "slot": "weapon",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "criticalChance": 0.05,
+                "criticalDamage": 1
+            },
+            "baseAttribute": "attack",
+            "lvlMin": 0,
+            "lvlMax": 10
+        },
+        {
+            "id": 15,
+            "name": "Magic stuff",
+            "description": "Weapon",
+            "slot": "weapon",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "manaOnMove": 15
+            },
+            "baseAttribute": "mana",
+            "lvlMin": 10,
+            "lvlMax": 20
+        },
+        {
+            "id": 16,
+            "name": "Simple sword",
+            "description": "Weapon",
+            "slot": "weapon",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "attack": 30
+            },
+            "baseAttribute": "attack",
+            "lvlMin": 10,
+            "lvlMax": 20
+        },
+        {
+            "id": 17,
+            "name": "Kite shield",
+            "description": "Weapon",
+            "slot": "weapon",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "armourMax": 99,
+                "armourOnMove": 1
+            },
+            "baseAttribute": "armour",
+            "lvlMin": 20,
+            "lvlMax": 30
+        },
+        {
+            "id": 18,
+            "name": "The Fang",
+            "description": "Weapon",
+            "slot": "weapon",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "attack": 40,
+                "healthLeech": 0.5
+            },
+            "baseAttribute": "attack",
+            "lvlMin": 20,
+            "lvlMax": 30
+        },
+        {
+            "id": 19,
+            "name": "Sandals",
+            "description": "Boots",
+            "slot": "legs",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "dodgeChance": 0.05
+            },
+            "baseAttribute": "armour",
+            "lvlMin": 0,
+            "lvlMax": 10
+        },
+        {
+            "id": 20,
+            "name": "Mage slippers",
+            "description": "Boots",
+            "slot": "legs",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "manaMax": 20
+            },
+            "baseAttribute": "mana",
+            "lvlMin": 0,
+            "lvlMax": 10
+        },
+        {
+            "id": 21,
+            "name": "Cowboy boots",
+            "description": "Boots",
+            "slot": "legs",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "healthMax": 40
+            },
+            "baseAttribute": "health",
+            "lvlMin": 10,
+            "lvlMax": 20
+        },
+        {
+            "id": 22,
+            "name": "Armed boots",
+            "description": "Boots",
+            "slot": "legs",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "armour": 30
+            },
+            "baseAttribute": "armour",
+            "lvlMin": 10,
+            "lvlMax": 20
+        },
+        {
+            "id": 23,
+            "name": "Spiky boot",
+            "description": "Boots",
+            "slot": "legs",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "attack": 20,
+                "criticalChance": 0.2
+            },
+            "baseAttribute": "attack",
+            "lvlMin": 20,
+            "lvlMax": 30
+        },
+        {
+            "id": 24,
+            "name": "Ley walkers",
+            "description": "Boots",
+            "slot": "legs",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "manaRegen": 1,
+                "manaMax": 25
+            },
+            "baseAttribute": "mana",
+            "lvlMin": 20,
+            "lvlMax": 30
+        },
+        {
+            "id": 25,
+            "name": "Ring of health",
+            "description": "Trinket",
+            "slot": "trinket",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "healthMax": 20
+            },
+            "baseAttribute": "healthMax",
+            "lvlMin": 0,
+            "lvlMax": 10
+        },
+        {
+            "id": 26,
+            "name": "Necklace of mana",
+            "description": "Trinket",
+            "slot": "trinket",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "manaPerMatch": 0.01
+            },
+            "baseAttribute": "mana",
+            "lvlMin": 0,
+            "lvlMax": 10
+        },
+        {
+            "id": 27,
+            "name": "Heart of stone",
+            "description": "Trinket",
+            "slot": "trinket",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "healthPerMatch": 0.01
+            },
+            "baseAttribute": "health",
+            "lvlMin": 10,
+            "lvlMax": 20
+        },
+        {
+            "id": 28,
+            "name": "Magic glove",
+            "description": "Trinket",
+            "slot": "trinket",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "manaOnCast": 10
+            },
+            "baseAttribute": "mana",
+            "lvlMin": 10,
+            "lvlMax": 20
+        },
+        {
+            "id": 29,
+            "name": "Meat parasite",
+            "description": "Trinket",
+            "slot": "trinket",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "manaMax": -40,
+                "healthRegen": 1
+            },
+            "baseAttribute": "health",
+            "lvlMin": 20,
+            "lvlMax": 30
+        },
+        {
+            "id": 30,
+            "name": "Third eye",
+            "description": "Trinket",
+            "slot": "trinket",
+            "cost": 1000,
+            "currency": "gold",
+            "maxDurability": 100,
+            "maxExperience": 120,
+            "attributes": {
+                "dodgeChance": 0.05
+            },
+            "baseAttribute": "armour",
+            "lvlMin": 20,
+            "lvlMax": 30
+        }
+    ],
+    "effects": [
+        {
+            "id": 1,
+            "name": "Snake Poison",
+            "attribute": "healthOnMove",
+            "value": -0.2,
+            "isPercentage": true,
+            "baseAttribute": "health",
+            "baseAttributeOwnerIsTarget": true,
+            "numberOfUses": 3
+        },
+        {
+            "id": 2,
+            "name": "Fury",
+            "attribute": "attackPerMatch",
+            "value": 0.2,
+            "isPercentage": false,
+            "numberOfUses": 5
+        },
+        {
+            "id": 3,
+            "name": "Mana drain",
+            "attribute": "manaLeech",
+            "value": 1,
+            "isPercentage": false,
+            "numberOfUses": 4
+        },
+        {
+            "id": 4,
+            "name": "Rust",
+            "attribute": "armourRegen",
+            "value": -0.33,
+            "isPercentage": true,
+            "baseAttribute": "armour",
+            "baseAttributeOwnerIsTarget": true,
+            "numberOfUses": 2
+        },
+        {
+            "id": 5,
+            "name": "Health regen",
+            "attribute": "healthRegen",
+            "value": 15,
+            "isPercentage": false,
+            "numberOfUses": 3
+        },
+        {
+            "id": 6,
+            "name": "Mage trap",
+            "attribute": "manaOnCast",
+            "value": -0.1,
+            "isPercentage": true,
+            "baseAttribute": "mana",
+            "baseAttributeOwnerIsTarget": true,
+            "numberOfUses": 3
+        },
+        {
+            "id": 7,
+            "name": "Lightning",
+            "attribute": "health",
+            "value": -20,
+            "isPercentage": false,
+            "numberOfUses": 0
+        }
+    ],
+    "spells": [
+        {
+            "id": 1,
+            "name": "Snakebite",
+            "affectsField": false,
+            "manaCost": 10,
+            "cooldown": 5,
+            "targetIsOwner": false,
+            "doesEndTurn": true,
+            "effect": 1,
+            "baseAttribute": "shield",
+			"cost": 1200,
+            "currency": "gold"
+        },
+        {
+            "id": 2,
+            "name": "Regeneration",
+            "affectsField": false,
+            "manaCost": 20,
+            "cooldown": 1,
+            "targetIsOwner": true,
+            "doesEndTurn": false,
+            "effect": 5,
+            "baseAttribute": "health",
+			"cost": 1200,
+            "currency": "gold"
+        },
+        {
+            "id": 3,
+            "name": "Rust",
+            "affectsField": false,
+            "manaCost": 30,
+            "cooldown": 3,
+            "targetIsOwner": false,
+            "doesEndTurn": true,
+            "effect": 4,
+            "baseAttribute": "attack",
+			"cost": 1200,
+            "currency": "gold"
+        },
+        {
+            "id": 4,
+            "name": "Small Cross",
+            "affectsField": true,
+            "manaCost": 40,
+            "cooldown": 2,
+            "targetIsOwner": false,
+            "doesEndTurn": true,
+            "pattern": "cross",
+            "width": 1,
+            "height": 1,
+            "baseAttribute": "mana",
+			"cost": 120,
+            "currency": "jewels"
+        },
+        {
+            "id": 5,
+            "name": "Bolt",
+            "affectsField": false,
+            "manaCost": 50,
+            "cooldown": 1,
+            "targetIsOwner": false,
+            "doesEndTurn": true,
+            "effect": 7,
+            "baseAttribute": "attack",
+			"cost": 100,
+            "currency": "jewels"
+        }
+    ],
+    "consumables": [
+        {
+            "id": 1,
+            "name": "Small Healing Potion",
+            "description": "Cheap and cheerful",
+            "cost": 250,
+            "currency": "gold",
+            "effect": 5
+        },
+    	{
+            "id": 2,
+            "name": "Poison",
+            "description": "Cheap and cheerful",
+            "cost": 350,
+            "currency": "gold",
+            "effect": 1
+        },
+		{
+            "id": 3,
+            "name": "Rust Potion",
+            "description": "Cheap and cheerful",
+            "cost": 150,
+            "currency": "gold",
+            "effect": 4
+        }
+    ]
+}

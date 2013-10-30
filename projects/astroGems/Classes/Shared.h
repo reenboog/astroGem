@@ -21,6 +21,7 @@ private:
     ~Shared() {};
 public:
     static Animation* loadAnimation(string file, string name);
+    static string languageShortNameForType(LanguageType type);
 };
 
 #endif /* defined(___pGigTickets__Shared__) */
