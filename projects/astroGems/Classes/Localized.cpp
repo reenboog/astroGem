@@ -31,36 +31,59 @@ void Localized::load() {
     string languagePrefix = Shared::languageShortNameForType(currentLanguage);
     
     // load file paths
-    unsigned long configFileSize = 0;
-    string configData = reinterpret_cast<const char*>(FileUtils::getInstance()->getFileData("Res/config.json", "r", &configFileSize));
+    unsigned long configDataSize = 0;
+    unsigned char *t = (FileUtils::getInstance()->getFileData("Res/config.json", "r", &configDataSize));
+    
+    char *configData = new char[configDataSize + 1];
+    memcpy(configData, t, configDataSize);
+    configData[configDataSize] = NULL;
+    
+    delete[] t;
+    t = NULL;
+    
+    //configData = configData.substr(0, configData.find_last_of('}') + 1);
     
     rapidjson::Document configDoc;
-    configDoc.Parse<0>(configData.c_str());
+    configDoc.Parse<0>(configData);
     
-    if(configDoc["filePaths"].IsArray()) {
-        for(auto it = configDoc["filePaths"].Begin(); it != configDoc["filePaths"].End(); ++it) {
+    const auto &pathsArray = configDoc["filePaths"];
+    if(pathsArray.IsArray()) {
+        for(auto it = pathsArray.Begin(); it != pathsArray.End(); ++it) {
             string path = it->GetString();
             
             FileUtils::getInstance()->addSearchPath((path + "/" + languagePrefix).c_str());
             FileUtils::getInstance()->addSearchPath(path.c_str());
         }
     }
-
-    // load strings
-    unsigned long stringsFileSize = 0;
-    string stringsData = reinterpret_cast<const char*>(FileUtils::getInstance()->getFileData("strings.json", "r", &stringsFileSize));
-
-    rapidjson::Document stringsDoc;
-    stringsDoc.Parse<0>(stringsData.c_str());
     
-    if(stringsDoc["strings"].IsObject()) {
-        for(auto it = stringsDoc["strings"].MemberBegin(); it != stringsDoc["strings"].MemberEnd(); ++it) {
+    delete[] configData;
+    
+    // load strings
+    unsigned long stringsDataSize = 0;
+    t = (FileUtils::getInstance()->getFileData("strings.json", "r", &stringsDataSize));
+    //stringsData = stringsData.substr(0, stringsData.find_last_of('}') + 1);
+    
+    char *stringsData = new char[stringsDataSize + 1];
+    memcpy(stringsData, t, stringsDataSize);
+    stringsData[stringsDataSize] = NULL;
+    
+    delete[] t;
+    t = NULL;
+    
+    rapidjson::Document stringsDoc;
+    stringsDoc.Parse<0>(stringsData);
+    
+    const auto &stringsMap = stringsDoc["strings"];
+    if(stringsMap.IsObject()) {
+        for(auto it = stringsMap.MemberBegin(); it != stringsMap.MemberEnd(); ++it) {
             string key = it->name.GetString();
             string value = it->value.GetString();
             
             __sharedInstance->strings.insert(make_pair(key, value));
         }
     }
+    
+    delete[] stringsData;
 }
 
 void Localized::purge() {
