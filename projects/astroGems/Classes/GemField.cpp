@@ -1321,6 +1321,8 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
 		int distanceBetweenEmpty = 0;
 		int lastDistance = 0;
         
+        bool playFallEffect = true;
+        
 		// Until we reach the top of the line
 		while(y >= 0) {
 			// If there is a gem
@@ -1332,7 +1334,9 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
 				} else {
                     // If the gem is not destroyed - move it down
 					distanceBetweenEmpty++;
-					moveGem(lineNumber, y, lineNumber, y + destroyedGems + emptyBlocks, columnsWithMatches);
+					this->moveGem(lineNumber, y, lineNumber, y + destroyedGems + emptyBlocks, columnsWithMatches, playFallEffect);
+                    
+                    playFallEffect = false;
 
 					if(emptyBlocks > 0) {
 						timesToFall--;
@@ -1359,6 +1363,9 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
 		}
         
 		y += destroyedGems + emptyBlocks;
+        
+        playFallEffect = true;
+        
 		int gemsFallen = 0;
 		while(y >= 0) {
 			if(fieldMask[y][lineNumber] == 1 && gems[y][lineNumber]->getState() != GS_Immovable) {
@@ -1377,7 +1384,10 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
 					colour = gems[y][lineNumber]->getGemColour();
 				}
 				gems[y][lineNumber]->reset(lineNumber, y - destroyedGems - emptyBlocks, colour, type);
-				gems[y][lineNumber]->fallTo(lineNumber, y, gemsFallen, columnsWithMatches);
+                
+				gems[y][lineNumber]->fallTo(lineNumber, y, gemsFallen, columnsWithMatches, playFallEffect);
+                
+                playFallEffect = false;
 				gemsFallen++;
 				if(emptyBlocks > 0) {
 					timesToFall--;
@@ -1401,13 +1411,13 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
 
 #pragma mark -
 
-void GemField::moveGem(int fromX, int fromY, int toX, int toY, int rowsToWait) {
+void GemField::moveGem(int fromX, int fromY, int toX, int toY, int rowsToWait, bool playFallEffect) {
 //    if(fieldMask[fromY][fromX] == 0 || fieldMask[toY][toX] == 0) {
 //        CCLOG("null! %i, %i, %i, %i", fromX, fromY, toX, toY);
 //    } else
     if(fromX != toX || fromY != toY) {
 		swapGemsIndices(fromX, fromY, toX, toY);
-		gems[toY][toX]->fallTo(toX, toY, 0, rowsToWait);
+		gems[toY][toX]->fallTo(toX, toY, 0, rowsToWait, playFallEffect);
 	}
 }
 

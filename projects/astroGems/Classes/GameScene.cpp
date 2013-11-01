@@ -54,9 +54,11 @@ bool GameScene::init() {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gems.plist");
     
     // preload effects and music
-    SimpleAudioEngine::getInstance()->preloadEffect("match.wav");
+    SimpleAudioEngine::getInstance()->preloadEffect("gemMatch.mp3");
     SimpleAudioEngine::getInstance()->preloadEffect("wrongMove.wav");
-    SimpleAudioEngine::getInstance()->preloadEffect("laser.wav");
+    SimpleAudioEngine::getInstance()->preloadEffect("gemFallen.mp3");
+    
+    SimpleAudioEngine::getInstance()->playBackgroundMusic("mainTheme.mp3", true);
     //
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -156,7 +158,7 @@ void GameScene::onStartedResolvinMatches(const MatchList &founMatches) {
     float pitch = 1;
 
     if(scoreMultiplier.state == ScoreMultiplier::SMS_Normal) {
-        //pitch = clampf(1 + scoreMultiplier.currentProgress / kScoreMultiplierMaxProgress - 0.34, 1, 1.3);
+        pitch = clampf(1 + scoreMultiplier.currentProgress / kScoreMultiplierMaxProgress - 0.34, 1, 1.3);
     } else if(scoreMultiplier.multiplier == kScoreExtraMultiplier) {
         pitch = 1.2;
     }
@@ -164,7 +166,7 @@ void GameScene::onStartedResolvinMatches(const MatchList &founMatches) {
     // play some sound
     // if length == 3
     
-    //SimpleAudioEngine::getInstance()->playEffect("match.wav", false, pitch, 0, 1);
+    SimpleAudioEngine::getInstance()->playEffect("gemMatch.mp3", false, pitch, 0, 1);
 }
 
 void GameScene::onRainbowGemDestroyed(int x, int y) {

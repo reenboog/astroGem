@@ -6,6 +6,8 @@
 
 #include "GameConfig.h"
 
+#include "SimpleAudioEngine.h"
+
 USING_NS_CC;
 
 //temporal constants
@@ -297,11 +299,11 @@ void Gem::swapTo(int x, int y, bool goBack, GemState completionState) {
 	moveTo(x, y, kSwapTime, goBack, 0, 0, completionState, true);
 }
 
-void Gem::fallTo(int x, int y, int blocksToWait, int rowsToWait) {
-	moveTo(x, y, kFallTime, false, blocksToWait, rowsToWait);
+void Gem::fallTo(int x, int y, int blocksToWait, int rowsToWait, bool playFallEffect) {
+	moveTo(x, y, kFallTime, false, blocksToWait, rowsToWait, GS_Moved, false, playFallEffect);
 }
 
-void Gem::moveTo(int x, int y, float time, bool goBack, int blocksToWait, int rowsToWait, GemState completionState, bool swapping) {
+void Gem::moveTo(int x, int y, float time, bool goBack, int blocksToWait, int rowsToWait, GemState completionState, bool swapping, bool playFallEffect) {
     
     if(state == GS_Moving) {
         return;
@@ -353,10 +355,16 @@ void Gem::moveTo(int x, int y, float time, bool goBack, int blocksToWait, int ro
     
     Action *moveBack = MoveTo::create((this->getPosition().getDistance(newLocation) / kTileSize) * time, this->getPosition());
     
+    auto fallEffectPlayer = [=]() {
+        if(playFallEffect) {
+            CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("gemFallen.mp3");
+        }
+    };
+    
 	if(goBack) {
 		movement = Sequence::create((FiniteTimeAction*) wait, (FiniteTimeAction*) move, (FiniteTimeAction*) moveBack, (FiniteTimeAction*) endMove, NULL);
 	} else {
-		movement = Sequence::create((FiniteTimeAction*) wait, (FiniteTimeAction*) move, (FiniteTimeAction*) endMove, NULL);
+		movement = Sequence::create((FiniteTimeAction*) wait, (FiniteTimeAction*) move, (FiniteTimeAction*) endMove, CallFunc::create(fallEffectPlayer), NULL);
 	}
     
 	state = GS_Moving;

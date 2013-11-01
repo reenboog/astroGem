@@ -17,7 +17,7 @@ public:
 	void deselect();
 
 	void swapTo(int x, int y, bool goBack = false, GemState completionState = GS_Moved);
-	void fallTo(int x, int y, int blocksToWait = 0, int rowsToWait = 0);
+	void fallTo(int x, int y, int blocksToWait = 0, int rowsToWait = 0, bool playFallEffect = false);
 
 	void match(MatchType matchType = MT_None);
 	void destroy(float delay = 0.0f);
@@ -45,7 +45,7 @@ public:
     static int scoreForGem(GemType type);
 private:
     void applyBonusStyling();
-	void moveTo(int x, int y, float time, bool goBack = false, int blocksToWait = 0, int rowsToWait = 0, GemState completionState = GS_Moved, bool swapping = false);
+	void moveTo(int x, int y, float time, bool goBack = false, int blocksToWait = 0, int rowsToWait = 0, GemState completionState = GS_Moved, bool swapping = false, bool playFallEffect = false);
 	void onMovementEnd(Object *sender);
 	void onDestructionEnd(Object *sender);
     void onTransformationEnd(Object *sender);

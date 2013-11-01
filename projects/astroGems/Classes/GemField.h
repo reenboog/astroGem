@@ -74,7 +74,7 @@ private:
     
 	void swapGems(int fromX, int fromY, int toX, int toY);
 	void swapGemsIndices(int fromX, int fromY, int toX, int toY);
-	void moveGem(int fromX, int fromY, int toX, int toY, int rowsToWait = 0);
+	void moveGem(int fromX, int fromY, int toX, int toY, int rowsToWait = 0, bool playFallEffect = false);
     
 	void freezeGem(int x, int y, int power);
 	void removeGem(int x, int y);
