@@ -5,6 +5,7 @@
 #include "GameUI.h"
 #include "GameConfig.h"
 #include "SimpleAudioEngine.h"
+#include "AchievementsUI.h"
 
 using namespace CocosDenshion;
 
@@ -38,9 +39,15 @@ Scene * GameScene::scene() {
     gameLayer->setUI(ui);
     ui->setGameLayer(gameLayer);
     
+    AchievementsUI *achievementsUI = AchievementsUI::create();
+    scene->addChild(achievementsUI);
+
+    achievementsUI->setGameLayer(gameLayer);
+    gameLayer->setAchievementsUI(achievementsUI);
     
     // start should be here instead
     gameLayer->reset();
+    gameLayer->onExit();
     
     return scene;
 }
@@ -58,7 +65,7 @@ bool GameScene::init() {
     SimpleAudioEngine::getInstance()->preloadEffect("wrongMove.wav");
     SimpleAudioEngine::getInstance()->preloadEffect("gemFallen.mp3");
     
-    SimpleAudioEngine::getInstance()->playBackgroundMusic("mainTheme.mp3", true);
+    //SimpleAudioEngine::getInstance()->playBackgroundMusic("mainTheme.mp3", true);
     //
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -241,6 +248,10 @@ void GameScene::onMakeFunBtnPressed() {
 
 void GameScene::setUI(GameUI *ui) {
     this->ui = ui;
+}
+
+void GameScene::setAchievementsUI(AchievementsUI *ui) {
+    this->achievementsUI = ui;
 }
 
 void GameScene::applyScoreMultiplierProgress(float progress) {

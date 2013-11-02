@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <list>
+#include <string>
 
 #define kFieldWidth 8
 #define kFieldHeight 9
@@ -42,6 +43,10 @@
 #define kScoreMultiplierFadeOutSpeed 4
 #define kScoreMultiplierFadeInSpeed 0.3
 #define kScoreMultiplierMaxProgress 20
+
+#define kAchievementPrefix "achievement"
+#define kAchievementItemHeight 50
+#define kAchievementCellBorderHeight 10
 
 const bool kPreloadField = false;
 
@@ -144,6 +149,22 @@ struct Match {
 
 typedef std::list<Match> MatchList;
 
+struct Achievement {
+    int identifier;
+    std::string description;
+    
+    Achievement() {
+        identifier = -1;
+        description = "Not Found";
+    }
+    
+    Achievement(int identifier, std::string description) {
+        this->identifier = identifier;
+        this->description = description;
+    }
+};
+
+typedef std::vector<Achievement> AchievementPool;
 
 #if(kSpawnBonuses == 1)
     const GemType kVerticalMatchFourBonus = GT_LineDestroyer;

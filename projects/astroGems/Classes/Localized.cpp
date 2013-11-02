@@ -104,5 +104,5 @@ string Localized::getString(const string &key) {
         CCLOG("String not found for key: %s", key.c_str());
     }
     
-    return "notFound";
+    return kLocalizedStringNotFound;
 }

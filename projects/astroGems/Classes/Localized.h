@@ -14,6 +14,8 @@
 
 #include "cocos2d.h"
 
+#define kLocalizedStringNotFound "notFound"
+
 USING_NS_CC;
 
 using namespace std;

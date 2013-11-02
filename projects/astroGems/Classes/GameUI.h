@@ -17,7 +17,7 @@ class GameScene;
 
 class GameUI: public Layer {
 public:
-    ~GameUI();
+    virtual ~GameUI();
     GameUI();
     // cocos2d stuff
     virtual bool init();

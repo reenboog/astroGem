@@ -8,6 +8,7 @@
 
 #include "Shared.h"
 
+
 Animation* Shared::loadAnimation(string file, string name) {
     Animation *animation = nullptr;
     

@@ -10,8 +10,7 @@
 #define ___pGigTickets__GameConfig__
 
 #include "cocos2d.h"
-
-USING_NS_CC;
+#include "Constants.h"
 
 #define kAppVersion         1
 #define kGameTimer          60
@@ -21,6 +20,7 @@ USING_NS_CC;
 #define kHypercubeIconValue 1000
 
 #define kInitialRainbowGemsRequiredAchievement 2
+
 
 class GameConfig {
 private:
@@ -47,8 +47,10 @@ public:
     
     int currentCoins;
     
+    AchievementPool achievements;
+    
     // required to align ui
-    Point gridPos;
+    cocos2d::Point gridPos;
 };
 
 #endif /* defined(___pGigTickets__GameConfig__) */

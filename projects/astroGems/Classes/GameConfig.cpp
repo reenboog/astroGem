@@ -7,6 +7,9 @@
 //
 
 #include "GameConfig.h"
+#include "Localized.h"
+
+USING_NS_CC;
 
 GameConfig * GameConfig::__sharedInstance = nullptr;
 
@@ -38,6 +41,23 @@ void GameConfig::load() {
     rainbowGemsRequiredForAchievement = kInitialRainbowGemsRequiredAchievement;
     
     currentCoins = 0;
+    
+    int itemIndex = 0;
+    
+    bool continueLoop = true;
+    do {
+        char buff[100];
+        sprintf(buff, "%s%i", kAchievementPrefix, itemIndex);
+        std::string itemDescription = Localized::getString(buff);
+        
+        if(itemDescription.compare(kLocalizedStringNotFound) != 0) {
+            achievements.push_back({itemIndex, itemDescription});
+            itemIndex++;
+        } else  {
+            continueLoop = false;
+        }
+        
+    } while(continueLoop);
 }
 
 void GameConfig::save() {

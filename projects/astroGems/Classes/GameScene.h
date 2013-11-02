@@ -9,10 +9,11 @@ USING_NS_CC;
 
 class GemField;
 class GameUI;
+class AchievementsUI;
 
 class GameScene: public cocos2d::Layer, public FieldWatcherDelegate {
 public:
-    ~GameScene();
+    virtual ~GameScene();
     GameScene();
     // cocos2d stuff
     virtual bool init();
@@ -47,6 +48,8 @@ public:
     
     // some setters/getters
     void setUI(GameUI *ui);
+    void setAchievementsUI(AchievementsUI *ui);
+    
     void setScore(int score);
     void applyScoreMultiplierProgress(float progress);
     void setScoreMultiplierProgress(float progress);
@@ -60,6 +63,7 @@ private:
     Sprite *back;
     
     GameUI *ui;
+    AchievementsUI *achievementsUI;
     
     bool swipeEnded;
 	bool canTouch;
