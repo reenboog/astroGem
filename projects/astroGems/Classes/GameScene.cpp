@@ -34,7 +34,7 @@ Scene * GameScene::scene() {
     scene->addChild(gameLayer);
     
     GameUI *ui = GameUI::create();
-    scene->addChild(ui);
+    gameLayer->addChild(ui);
     
     gameLayer->setUI(ui);
     ui->setGameLayer(gameLayer);
@@ -47,7 +47,13 @@ Scene * GameScene::scene() {
     
     // start should be here instead
     gameLayer->reset();
-    gameLayer->onExit();
+    
+    //set correct zOrders
+    achievementsUI->setZOrder(zActiveLayer);
+    gameLayer->setZOrder(zInactiveLayer);
+    ui->setZOrder(zInactiveLayer + 1);
+    
+    gameLayer->putOn(achievementsUI);
     
     return scene;
 }
@@ -103,7 +109,19 @@ bool GameScene::init() {
     
     scheduleUpdate();
     
+    blackout = LayerColor::create(Color4B(0, 0, 0, 0));
+	blackout->setPosition({0, 0});
+	blackout->setZOrder(zShadow);
+
+	this->addChild(blackout);
+    
     return true;
+}
+
+void GameScene::onEnter() {
+    if(!this->isRunning()) {
+        Layer::onEnter();
+    }
 }
 
 void GameScene::reset() {
@@ -242,6 +260,103 @@ void GameScene::update(float dt) {
 void GameScene::onMakeFunBtnPressed() {
     canTouch = false;
     field->destroyEntireField();
+}
+
+void GameScene::onPauseBtnPressed() {
+    this->putOn(achievementsUI);
+}
+
+#pragma mark - stackable stuff
+
+void GameScene::popUp(StackableLayer *baseLayer) {
+	if(!this->isRunning()) {
+        this->onEnter();
+    }
+
+    field->shuffleField();
+	this->disableTouches();
+
+	ScaleTo *showEffect = ScaleTo::create(kStackTransitionTime, 1);
+	CallFuncN *showAction = CallFuncN::create(CC_CALLBACK_0(GameScene::enableTouches, this));
+
+	this->runAction(Sequence::create(showEffect, showAction, NULL));
+    this->setZOrder(zActiveLayer);
+
+	this->baseLayer = baseLayer;
+}
+
+void GameScene::popOut() {
+	this->disableTouches();
+
+	ScaleTo *hideEffect = ScaleTo::create(kStackTransitionTime, 0);
+	Sequence *hideAction = Sequence::create(CallFuncN::create(CC_CALLBACK_0(GameScene::enableTouches, this)), // remove temporal btn
+                                                          CallFuncN::create(CC_CALLBACK_0(GameScene::onExit, this)), NULL);
+
+	this->runAction(Sequence::create(hideAction, NULL));
+
+	if(baseLayer) {
+		baseLayer->takeOff();
+	}
+
+	baseLayer = nullptr;
+
+	this->setZOrder(zInactiveLayer);
+}
+
+void GameScene::putOn(StackableLayer *overlay) {
+	this->disableTouches();
+
+	FadeTo *hideEffect = FadeTo::create(kStackTransitionTime, kStackShadowOpacity);
+	blackout->runAction(hideEffect);
+
+	Sequence *hideAction = Sequence::create(CallFuncN::create(CC_CALLBACK_0(GameScene::enableTouches, this)), // remove temporal btn
+                                            CallFuncN::create(CC_CALLBACK_0(GameScene::onExit, this)), NULL);
+
+	this->runAction(Sequence::create(DelayTime::create(kStackTransitionTime),
+                                     hideAction,
+                                     NULL));
+
+	overlay->popUp(this);
+}
+
+void GameScene::takeOff() {
+    this->onEnter();
+	
+	FadeTo *showEffect = FadeTo::create(kStackTransitionTime, 0);
+	blackout->runAction(showEffect);
+
+	Sequence *showAction = Sequence::create(CallFuncN::create(CC_CALLBACK_0(GameScene::enableTouches, this)),
+                                            //CallFuncN::create(CC_CALLBACK_0(GameScene::updatePlayerPosition, this)),
+                                            NULL);
+	this->runAction(Sequence::create(DelayTime::create(2), showAction, NULL));
+}
+
+void GameScene::disableTouches() {
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+
+	if(!touchBlocker) {
+		MenuItemImage *touchBlockerButton = MenuItemImage::create("blankPixel.png", "blankPixel.png", "blankPixel.png");
+        
+        touchBlockerButton->setContentSize(visibleSize);
+		touchBlockerButton->setPosition({0, 0});
+		//touchBlockerButton->setAnchorPoint({0.5, 0.5});
+		touchBlockerButton->setOpacity(0);
+		touchBlockerButton->setZOrder(10);
+
+		touchBlocker = Menu::createWithItem(touchBlockerButton);
+		touchBlocker->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+
+		this->addChild(touchBlocker, 10);
+
+		touchBlocker->setTouchPriority(-250);
+	}
+}
+
+void GameScene::enableTouches() {
+	if(touchBlocker) {
+		touchBlocker->removeFromParentAndCleanup(true);
+		touchBlocker = nullptr;
+	}
 }
 
 #pragma mark - setters/getters

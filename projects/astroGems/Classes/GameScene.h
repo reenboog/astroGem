@@ -4,6 +4,7 @@
 
 #include "cocos2d.h"
 #include "FieldWatcherDelegate.h"
+#include "StackableLayer.h"
 
 USING_NS_CC;
 
@@ -11,7 +12,7 @@ class GemField;
 class GameUI;
 class AchievementsUI;
 
-class GameScene: public cocos2d::Layer, public FieldWatcherDelegate {
+class GameScene: public cocos2d::Layer, public FieldWatcherDelegate, public StackableLayer {
 public:
     virtual ~GameScene();
     GameScene();
@@ -42,9 +43,21 @@ public:
 
     virtual void onRainbowGemDestroyed(int x, int y);
     
+    // stackabl layer virtuals
+    virtual void popUp(StackableLayer *baseLayer);
+	virtual void popOut();
+	virtual void putOn(StackableLayer *overlay);
+	virtual void takeOff();
+	virtual void disableTouches();
+	virtual void enableTouches();
+    
     //void setTimeLeft(float time);
     
+    void onEnter();
+    
+    // ui
     void onMakeFunBtnPressed();
+    void onPauseBtnPressed();
     
     // some setters/getters
     void setUI(GameUI *ui);
