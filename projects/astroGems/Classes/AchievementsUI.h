@@ -9,6 +9,7 @@
 #ifndef __astroGems__AchievementsUI__
 #define __astroGems__AchievementsUI__
 
+#include "StackableLayer.h"
 #include "cocos2d.h"
 #include "cocos-ext.h"
 
@@ -17,7 +18,7 @@ USING_NS_CC_EXT;
 
 class GameScene;
 
-class AchievementsUI: public Layer, public TableViewDataSource, public TableViewDelegate {
+class AchievementsUI: public Layer, public TableViewDataSource, public TableViewDelegate, public StackableLayer {
 public:
     virtual ~AchievementsUI();
     AchievementsUI();
@@ -34,17 +35,32 @@ public:
     virtual unsigned int numberOfCellsInTableView(cocos2d::extension::TableView *table);
 
     void setGameLayer(GameScene *layer);
+    
+    // stackable layer stuff
+    virtual void popUp(StackableLayer *baseLayer);
+	virtual void popOut();
+	virtual void putOn(StackableLayer *overlay);
+	virtual void takeOff();
+	virtual void disableTouches();
+	virtual void enableTouches();
+    
+    void onEnter();
 private:
     void populateCells();
     void onPlayBtnPressed();
 private:
     TableView *tableView;
+    Sprite *back;
     
     int tableWidth;
     int tableHeight;
 
     int itemWidth;
     int itemHeight;
+    
+    Point tableViewPos;
+    Point backPos;
+    Point playMenuPos;
     
     Menu *playMenu;
     

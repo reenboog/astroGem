@@ -21,6 +21,7 @@ AchievementsUI::AchievementsUI(): Layer() {
     playMenu = nullptr;
     
     gameLayer = nullptr;
+    back = nullptr;
     
     tableWidth = 0;
     tableHeight = 0;
@@ -40,9 +41,6 @@ bool AchievementsUI::init() {
     Point screenCenter = {visibleSize.width / 2.0, visibleSize.height / 2.0};
     Point gridPos = GameConfig::sharedInstance()->gridPos;
     
-    LayerColor *shadow = LayerColor::create({0, 0, 0, 150});
-    this->addChild(shadow);
-    
     // table view
     // get grid dimensions
     Sprite *grid = Sprite::create("field/grid.png");
@@ -52,21 +50,27 @@ bool AchievementsUI::init() {
     itemWidth = item->getContentSize().width;
     
     tableHeight = grid->getContentSize().height * 1.175;
-    tableWidth = itemWidth;;
+    tableWidth = itemWidth;
     
-    Point tableViewPos = {(visibleSize.width - itemWidth) * 0.5 , visibleSize.height - tableHeight};
+    tableViewPos = Point((visibleSize.width - item->getContentSize().width) * 0.5 , visibleSize.height - tableHeight);
+    backPos = Point(visibleSize.width * 0.5, tableViewPos.y - 20);
+    playMenuPos = Point(visibleSize.width / 2, tableViewPos.y);
+    
+    back = Sprite::create("ui/achievementTableBack.png");
+    back->setAnchorPoint({0.5, 0});
+    back->setPosition(backPos + Point(0, visibleSize.height));
+    back->setOpacity(200);
+    
+    this->addChild(back);
     
     tableView = TableView::create(this, {tableWidth, tableHeight});
 	tableView->setDirection(ScrollView::Direction::VERTICAL);
-    //tableView->setAnchorPoint({0.5, 1});
-	tableView->setPosition(tableViewPos);
+	tableView->setPosition(tableViewPos + Point(0, visibleSize.height));
 	tableView->setDelegate(this);
     //tableView->setBounceable(true);
 	tableView->setVerticalFillOrder(TableView::VerticalFillOrder::TOP_DOWN);
 
     this->addChild(tableView);
-    
-    tableView->reloadData();
     
     // play menu
     
@@ -75,11 +79,18 @@ bool AchievementsUI::init() {
     playBtn->setPosition({0, 0});
     
     playMenu = Menu::create(playBtn, NULL);
-    playMenu->setPosition({visibleSize.width / 2, tableViewPos.y});
+    playMenu->setPosition(playMenuPos + Point(0, -visibleSize.height));
     
     this->addChild(playMenu);
     
     this->populateCells();
+    tableView->reloadData();
+    
+    blackout = LayerColor::create(Color4B(0, 0, 0, 0));
+	blackout->setPosition({0, 0});
+	blackout->setZOrder(zShadow);
+    
+	this->addChild(blackout);
     
     return true;
 }
@@ -115,6 +126,123 @@ void AchievementsUI::populateCells() {
     //
 }
 
+#pragma mark - ui callbacks
+
+void AchievementsUI::onPlayBtnPressed() {
+    this->popOut();
+}
+
+#pragma mark - stackable stuff
+
+void AchievementsUI::onEnter() {
+    if(!this->isRunning()) {
+        Layer::onEnter();
+    }
+}
+
+void AchievementsUI::popUp(StackableLayer *baseLayer) {
+    this->onEnter();
+    
+	this->disableTouches();
+    
+	CallFuncN *showAction = CallFuncN::create(CC_CALLBACK_0(AchievementsUI::enableTouches, this));
+    
+    tableView->runAction(EaseSineOut::create(MoveTo::create(kStackTransitionTime, tableViewPos)));
+    back->runAction(EaseSineOut::create(MoveTo::create(kStackTransitionTime, backPos)));
+    playMenu->runAction(EaseSineOut::create(MoveTo::create(kStackTransitionTime, playMenuPos)));
+    
+	this->runAction(Sequence::create(DelayTime::create(kStackTransitionTime), showAction, NULL));
+    this->setZOrder(zActiveLayer);
+    
+	this->baseLayer = baseLayer;
+}
+
+void AchievementsUI::popOut() {
+	this->disableTouches();
+    
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    
+    tableView->runAction(EaseSineOut::create(MoveTo::create(kStackTransitionTime, tableViewPos + Point(0, visibleSize.height))));
+    back->runAction(EaseSineOut::create(MoveTo::create(kStackTransitionTime, backPos + Point(0, visibleSize.height))));
+    playMenu->runAction(EaseSineOut::create(MoveTo::create(kStackTransitionTime, playMenuPos + Point(0, -visibleSize.height))));
+	
+	Sequence *hideAction = Sequence::create(CallFuncN::create(CC_CALLBACK_0(AchievementsUI::enableTouches, this)), // disable touches?
+                                            CallFuncN::create(CC_CALLBACK_0(AchievementsUI::onExit, this)), NULL);
+    
+	this->runAction(Sequence::create(DelayTime::create(kStackTransitionTime), hideAction, NULL));
+    
+	if(baseLayer) {
+		baseLayer->takeOff();
+	}
+    
+	baseLayer = nullptr;
+    
+	this->setZOrder(zInactiveLayer);
+}
+
+void AchievementsUI::putOn(StackableLayer *overlay) {
+	this->disableTouches();
+    
+	FadeTo *hideEffect = FadeTo::create(kStackTransitionTime, kStackShadowOpacity);
+	blackout->runAction(hideEffect);
+    
+	Sequence *hideAction = Sequence::create(CallFuncN::create(CC_CALLBACK_0(AchievementsUI::enableTouches, this)), // disable touches?
+                                            CallFuncN::create(CC_CALLBACK_0(AchievementsUI::onExit, this)), NULL);
+    
+	this->runAction(Sequence::create(DelayTime::create(kStackTransitionTime), hideAction, NULL));
+    
+	overlay->popUp(this);
+}
+
+void AchievementsUI::takeOff() {
+	if(!this->isRunning()) {
+        this->onEnter();
+    }
+    
+	FadeTo *showEffect = FadeTo::create(kStackTransitionTime, 0);
+	blackout->runAction(showEffect);
+    
+	Sequence *showAction = Sequence::create(CallFuncN::create(CC_CALLBACK_0(AchievementsUI::enableTouches, this)),
+                                            //CallFuncN::create(CC_CALLBACK_0(GameScene::updatePlayerPosition, this)),
+                                            NULL);
+	this->runAction(Sequence::create(DelayTime::create(kStackTransitionTime), showAction, NULL));
+}
+
+void AchievementsUI::disableTouches() {
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+    
+	if(!touchBlocker) {
+		MenuItemImage *touchBlockerButton = MenuItemImage::create("blankPixel.png", "blankPixel.png", "blankPixel.png");
+        
+        touchBlockerButton->setContentSize(visibleSize);
+		touchBlockerButton->setPosition({0, 0});
+		//touchBlockerButton->setAnchorPoint({0.5, 0.5});
+		touchBlockerButton->setOpacity(0);
+		touchBlockerButton->setZOrder(10);
+        
+		touchBlocker = Menu::createWithItem(touchBlockerButton);
+		touchBlocker->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+        
+		this->addChild(touchBlocker, 10);
+        
+		touchBlocker->setTouchPriority(-250);
+	}
+}
+
+void AchievementsUI::enableTouches() {
+	if(touchBlocker) {
+		touchBlocker->removeFromParentAndCleanup(true);
+		touchBlocker = nullptr;
+	}
+}
+
+
+#pragma mark - set/get
+
+void AchievementsUI::setGameLayer(GameScene *layer) {
+    this->gameLayer = layer;
+}
+
 #pragma mark - Achievement cell
 
 AchievementTableViewCell::~AchievementTableViewCell() {
@@ -133,25 +261,21 @@ AchievementTableViewCell::AchievementTableViewCell(int itemId) {
     this->addChild(background);
     
     icon = Sprite::create(fileName->getCString());
-    icon->setPosition({background->getContentSize().width * 0.1, background->getContentSize().height * 0.5});
+    icon->setPosition({background->getContentSize().width * 0.08, background->getContentSize().height * 0.5});
     
     background->addChild(icon);
     
     caption = LabelBMFont::create(GameConfig::sharedInstance()->achievements[itemId].description.c_str(), "time.fnt");
     caption->setAnchorPoint({0, 0.5});
-    caption->setPosition({background->getContentSize().width * 0.2 + icon->getContentSize().width, background->getContentSize().height * 0.5});
+    caption->setPosition({background->getContentSize().width * 0.1 + icon->getContentSize().width, background->getContentSize().height * 0.5});
     
     background->addChild(caption);
-}
-
-#pragma mark - ui callbacks
-
-void AchievementsUI::onPlayBtnPressed() {
-    //
-}
-
-#pragma mark - set/get
-
-void AchievementsUI::setGameLayer(GameScene *layer) {
-    this->gameLayer = layer;
+    
+    if(GameConfig::sharedInstance()->currentAchievementIndex < itemId) {
+        Sprite *shadow = Sprite::create("ui/achievementItemMount.png");
+        shadow->setPosition({background->getContentSize().width / 2, background->getContentSize().height / 2});
+        shadow->setOpacity(200);
+        
+        background->addChild(shadow);
+    }
 }
