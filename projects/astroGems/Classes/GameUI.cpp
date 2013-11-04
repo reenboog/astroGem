@@ -176,7 +176,7 @@ void GameUI::reset() {
 #pragma mark - callbacks
 
 void GameUI::onPauseBtnPressed(Object *sender) {
-    
+    gameLayer->onPauseBtnPressed();
 }
 
 #pragma mark - setters
