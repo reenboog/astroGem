@@ -11,6 +11,8 @@
 
 USING_NS_CC;
 
+#define kCurrentAchievementIndexKey "currentAchievementIndex"
+
 GameConfig * GameConfig::__sharedInstance = nullptr;
 
 GameConfig::~GameConfig() {
@@ -40,8 +42,9 @@ void GameConfig::load() {
     
     rainbowGemsRequiredForAchievement = kInitialRainbowGemsRequiredAchievement;
     
+    currentAchievementIndex = 0;
     currentCoins = 0;
-    
+
     int itemIndex = 0;
     
     bool continueLoop = true;
@@ -58,9 +61,12 @@ void GameConfig::load() {
         }
         
     } while(continueLoop);
+    
+    currentAchievementIndex = UserDefault::getInstance()->getIntegerForKey(kCurrentAchievementIndexKey, 0);
 }
 
 void GameConfig::save() {
     // use user defaults here
+    UserDefault::getInstance()->setIntegerForKey("config_version", version);
     
 }

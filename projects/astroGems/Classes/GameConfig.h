@@ -47,6 +47,8 @@ public:
     
     int currentCoins;
     
+    int currentAchievementIndex;
+    
     AchievementPool achievements;
     
     // required to align ui
