@@ -26,6 +26,11 @@
 #define zLighting 90
 #define zMatchScore 100
 
+#define zActiveLayer 12
+#define zInactiveLayer 0
+
+#define zShadow 10
+
 #define kScoreExtraMultiplier 2
 #define kScoreMultiplierActiveTime 5
 
@@ -47,6 +52,9 @@
 #define kAchievementPrefix "achievement"
 #define kAchievementItemHeight 50
 #define kAchievementCellBorderHeight 10
+
+#define kStackTransitionTime 0.5f
+#define kStackShadowOpacity 170
 
 const bool kPreloadField = false;
 
