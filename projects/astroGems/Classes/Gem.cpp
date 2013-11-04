@@ -470,11 +470,44 @@ void Gem::destroy(float delay) {
         
         auto showScores = [this]() {
             if(this->getParent()) {
+                Color3B labelColor = {255, 255, 255};
+                
+                switch(this->getGemColour()) {
+                    case GC_Red:
+                        labelColor = {255, 50, 50};
+                        break;
+                    case GC_Green:
+                        labelColor = {50, 255, 50};
+                        break;
+                    case GC_Blue:
+                        labelColor = {50, 50, 255};
+                        break;
+                    case GC_Purple:
+                        labelColor = {255, 50, 255};
+                        break;
+                    case GC_Orange:
+                        labelColor = {255, 150, 0};
+                        break;
+                    case GC_Yellow:
+                        labelColor = {255, 255, 0};
+                        break;
+                    case GC_White:
+                    case GC_Hypercube:
+                    case GC_Random:
+                        labelColor = {255, 255, 255};
+                    default:
+                        break;
+                }
+
+                
                 String scoreStr;
                 scoreStr.appendWithFormat("%i", Gem::scoreForGem(getType()));
-                LabelTTF *label = LabelTTF::create(scoreStr.getCString(), "Trebuchet", 36);
+
+                LabelBMFont *label = LabelBMFont::create(scoreStr.getCString(), "redCircle52.fnt");
+
                 label->setPosition(this->getPosition());
                 label->setOpacity(0);
+                label->setColor(labelColor);
                 label->setScale(0.5);
                 
                 FiniteTimeAction *destructionAnim = nullptr;
@@ -483,6 +516,7 @@ void Gem::destroy(float delay) {
                                                                  FadeIn::create(0.33),
                                                                  MoveBy::create(0.5, {0, 100}),
                                                                  NULL),
+                                                   DelayTime::create(0.3),
                                                    Spawn::create(FadeOut::create(0.14),
                                                                  ScaleTo::create(0.24, 0.5), NULL), NULL);
                 
@@ -519,6 +553,14 @@ void Gem::destroy(float delay) {
 		state = GS_Destroying;
         
 		runAction(destruction);
+        
+        if(this->getGemColour() == GC_Coin) {
+            CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("coins1.wav");
+        }
+        
+        if(this->getType() == GT_Cross || this->getType() == GT_LineHor || this->getType() == GT_LineVer) {
+            CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("special_gem_clear_one_row.caf");
+        }
         
         if(this->getParent()) {
 //            LabelTTF *label = LabelTTF::create("+30", "Trebuchet", 36);
