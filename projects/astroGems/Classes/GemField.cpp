@@ -99,7 +99,7 @@ bool GemField::init() {
     
     state = FS_Ready;
     
-   	if(1) {
+   	if(kPreloadField) {
 		const int customField[kFieldHeight][kFieldWidth] = {
 			{2,3,1,2,1,4,2,3},
             {1,2,1,2,1,4,2,3},
@@ -132,7 +132,6 @@ bool GemField::init() {
 			}
 		}
 	}
-	shuffleField(false);
     
     scheduleUpdate();
     
@@ -286,6 +285,8 @@ void GemField::resolveMatch(const Match &match) {
 		if(gems[y][x]->getState() != GS_Matched && gems[y][x]->getState() != GS_Transforming) {
 			// If we have a long enough match with no bonus added yet and the gem was recently moved
 			if(!bonusWasAdded && match.length > 3 && gems[y][x]->getState() == GS_Moved) {
+                
+                SimpleAudioEngine::getInstance()->playEffect("bonusCreation.wav");
 				// If it's a bonus, process it as usually, but turn the next gem into a bonus
 				if(gems[y][x]->getType() != GT_Colour) {
 					createBonusNext = true;
@@ -312,6 +313,8 @@ void GemField::resolveMatch(const Match &match) {
 			} else {
                 // If the gem wasn't moved, but the one before it was a bonus one, turn it into a bonus
 				if(createBonusNext) {
+                    SimpleAudioEngine::getInstance()->playEffect("bonusCreation.wav");
+                    
 					if(stepX == 0) {
 						// Transform into bonus for vertical >3 in a row
 						if(match.length == 4) {
@@ -833,6 +836,8 @@ void GemField::deselectGem(int x, int y) {
 #pragma mark - public API for players
 
 void GemField::swipeAction(const Point &startCoordinates, int direction) {
+    string file = "btnClick.wav";
+    
 	int fromX = startCoordinates.x;
 	int fromY = startCoordinates.y;
 	
@@ -863,6 +868,7 @@ void GemField::swipeAction(const Point &startCoordinates, int direction) {
 	}
 	if((toX - fromX) + (toY - fromY) != 0) {
 		if(selectedGemCoordinates != nullptr) {
+            //file = "click2.wav";
 			deselectGem(selectedGemCoordinates->x, selectedGemCoordinates->y);
 		}
 		if(fieldMask[fromY][fromX] == 1 && freezeMask[fromY][fromX] == 0 && fieldMask[toY][toX] == 1  && freezeMask[toY][toX] == 0 &&
@@ -873,6 +879,11 @@ void GemField::swipeAction(const Point &startCoordinates, int direction) {
 
             if(first->getGemColour() == GC_Coin || second->getGemColour() == GC_Coin) {
                 state = FS_Destroying;
+                
+                for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
+                    (*it)->onMoveMade(true);
+                    (*it)->onGemsStartedSwapping();
+                }
                 
                 if(first->getGemColour() == GC_Coin) {
                     destroyGem(fromX, fromY);
@@ -886,17 +897,26 @@ void GemField::swipeAction(const Point &startCoordinates, int direction) {
             }
 		}
 	}
+    
+    SimpleAudioEngine::getInstance()->playEffect(file.c_str());
 }
 
 void GemField::clickAction(const Point &clickCoordinates) {
 	int toX = clickCoordinates.x;
 	int toY = clickCoordinates.y;
+    
+    //string file = "click1.wav";
 
 	if(toX >= 0 && toX < kFieldWidth && toY >= 0 && toY < kFieldHeight) {
 		if(fieldMask[toY][toX] == 1 && freezeMask[toY][toX] == 0) {
 			if(selectedGemCoordinates == nullptr) {
                 if(gems[toY][toX]->getGemColour() == GC_Coin) {
                     state = FS_Destroying;
+                    for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
+                        (*it)->onMoveMade(true);
+                        (*it)->onGemsStartedSwapping();
+                    }
+                    
                     this->destroyGem(toX, toY);
                 } else {
                     selectGem(toX, toY);
@@ -907,6 +927,7 @@ void GemField::clickAction(const Point &clickCoordinates) {
 				// Same gem
 				if(selectedGemCoordinates->getDistance(clickCoordinates) == 0) {
 					deselectGem(selectedX, selectedY);
+                    //file = "click0.wav";
 				} else {
                     // Different gems
 					// Nearby gem
@@ -916,6 +937,11 @@ void GemField::clickAction(const Point &clickCoordinates) {
                             
                             if(gems[toY][toX]->getGemColour() == GC_Coin) {
                                 state = FS_Destroying;
+                                for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
+                                    (*it)->onMoveMade(true);
+                                    (*it)->onGemsStartedSwapping();
+                                }
+                                
                                 this->destroyGem(toX, toY);
                             } else {
                                 swapGems(selectedX, selectedY, toX, toY);
@@ -924,8 +950,15 @@ void GemField::clickAction(const Point &clickCoordinates) {
 					} else {
 						deselectGem(selectedX, selectedY);
                         
+                        //file = "click2.wav";
+                        
                         if(gems[toY][toX]->getGemColour() == GC_Coin) {
                             state = FS_Destroying;
+                            for(FieldWatcherDelegatePool::iterator it = watchers.begin(); it != watchers.end(); it++) {
+                                (*it)->onMoveMade(true);
+                                (*it)->onGemsStartedSwapping();
+                            }
+                            
                             this->destroyGem(toX, toY);
                         } else {
                             selectGem(toX, toY);
@@ -935,6 +968,8 @@ void GemField::clickAction(const Point &clickCoordinates) {
 			}
 		}
 	}
+    
+    //SimpleAudioEngine::getInstance()->playEffect(file.c_str());
 }
 
 #pragma mark - update
