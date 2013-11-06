@@ -39,6 +39,7 @@
 		B8B5CF6A181BE51400F9A7A0 /* Icon-120.png in Resources */ = {isa = PBXBuildFile; fileRef = B8B5CF67181BE51400F9A7A0 /* Icon-120.png */; };
 		B8B5CF6B181BE51400F9A7A0 /* Icon-152.png in Resources */ = {isa = PBXBuildFile; fileRef = B8B5CF68181BE51400F9A7A0 /* Icon-152.png */; };
 		B8CF45181823BECF0034CD05 /* AchievementsUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8CF45161823BECF0034CD05 /* AchievementsUI.cpp */; };
+		B8E487881827BB6400DF9C73 /* LevelUpUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8E487861827BB6400DF9C73 /* LevelUpUI.cpp */; };
 		B8F42666180584E900AF20A7 /* GameUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8F42664180584E900AF20A7 /* GameUI.cpp */; };
 		BF171245129291EC00B8313A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB012928DE900B8313A /* OpenGLES.framework */; };
 		BF1712471292920000B8313A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB412928DE900B8313A /* libz.dylib */; };
@@ -222,11 +223,14 @@
 		B8279E1417F3F63800AD8B7C /* Icon-144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-144.png"; sourceTree = SOURCE_ROOT; };
 		B87CCB891820A826000B356F /* Localized.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Localized.cpp; path = ../Classes/Localized.cpp; sourceTree = "<group>"; };
 		B87CCB8A1820A826000B356F /* Localized.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Localized.h; path = ../Classes/Localized.h; sourceTree = "<group>"; };
+		B8B1748118252B66000918A7 /* StackableLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StackableLayer.h; path = ../Classes/StackableLayer.h; sourceTree = "<group>"; };
 		B8B5CF66181BE51400F9A7A0 /* Icon-76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-76.png"; sourceTree = SOURCE_ROOT; };
 		B8B5CF67181BE51400F9A7A0 /* Icon-120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-120.png"; sourceTree = SOURCE_ROOT; };
 		B8B5CF68181BE51400F9A7A0 /* Icon-152.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-152.png"; sourceTree = SOURCE_ROOT; };
 		B8CF45161823BECF0034CD05 /* AchievementsUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AchievementsUI.cpp; path = ../Classes/AchievementsUI.cpp; sourceTree = "<group>"; };
 		B8CF45171823BECF0034CD05 /* AchievementsUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AchievementsUI.h; path = ../Classes/AchievementsUI.h; sourceTree = "<group>"; };
+		B8E487861827BB6400DF9C73 /* LevelUpUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LevelUpUI.cpp; path = ../Classes/LevelUpUI.cpp; sourceTree = "<group>"; };
+		B8E487871827BB6400DF9C73 /* LevelUpUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LevelUpUI.h; path = ../Classes/LevelUpUI.h; sourceTree = "<group>"; };
 		B8F42664180584E900AF20A7 /* GameUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameUI.cpp; path = ../Classes/GameUI.cpp; sourceTree = "<group>"; };
 		B8F42665180584E900AF20A7 /* GameUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameUI.h; path = ../Classes/GameUI.h; sourceTree = "<group>"; };
 		BF170DB012928DE900B8313A /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -414,6 +418,9 @@
 				B8F42665180584E900AF20A7 /* GameUI.h */,
 				B8CF45161823BECF0034CD05 /* AchievementsUI.cpp */,
 				B8CF45171823BECF0034CD05 /* AchievementsUI.h */,
+				B8B1748118252B66000918A7 /* StackableLayer.h */,
+				B8E487861827BB6400DF9C73 /* LevelUpUI.cpp */,
+				B8E487871827BB6400DF9C73 /* LevelUpUI.h */,
 			);
 			name = scenes;
 			sourceTree = "<group>";
@@ -613,6 +620,7 @@
 				B8279DF717F3F4F600AD8B7C /* GameConfig.cpp in Sources */,
 				B8279DF817F3F4F600AD8B7C /* GameScene.cpp in Sources */,
 				B8279DF917F3F4F600AD8B7C /* Gem.cpp in Sources */,
+				B8E487881827BB6400DF9C73 /* LevelUpUI.cpp in Sources */,
 				B8279DFA17F3F4F600AD8B7C /* GemField.cpp in Sources */,
 				B8279DFD17F3F4FD00AD8B7C /* Shared.cpp in Sources */,
 				B8F42666180584E900AF20A7 /* GameUI.cpp in Sources */,

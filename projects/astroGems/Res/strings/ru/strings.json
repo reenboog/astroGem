@@ -4,6 +4,8 @@
         "secondString": "test2",
         "pseudoString": "Another incredible test",
         
+        "levelUp": "LevelUP!",
+        
         "achievement0": "Protection Crystal",
         "achievement1": "Advance lens",
         "achievement2": "Drill",

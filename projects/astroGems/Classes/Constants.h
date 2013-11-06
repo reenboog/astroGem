@@ -26,6 +26,10 @@
 #define zLighting 90
 #define zMatchScore 100
 
+#define zBackground -1
+#define zGrid 0
+#define zField 1
+
 #define zActiveLayer 12
 #define zInactiveLayer 0
 
@@ -55,6 +59,8 @@
 
 #define kStackTransitionTime 0.5f
 #define kStackShadowOpacity 170
+
+#define kNumberOfBackgrounds 21
 
 const bool kPreloadField = false;
 

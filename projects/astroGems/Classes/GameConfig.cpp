@@ -12,6 +12,8 @@
 USING_NS_CC;
 
 #define kCurrentAchievementIndexKey "currentAchievementIndex"
+#define kCurrentLevelKey "currentLevel"
+#define kCurrentCoinsKey "currentCoins"
 
 GameConfig * GameConfig::__sharedInstance = nullptr;
 
@@ -44,6 +46,7 @@ void GameConfig::load() {
     
     currentAchievementIndex = 0;
     currentCoins = 0;
+    currentLevel = 0;
 
     int itemIndex = 0;
     
@@ -63,10 +66,15 @@ void GameConfig::load() {
     } while(continueLoop);
     
     currentAchievementIndex = UserDefault::getInstance()->getIntegerForKey(kCurrentAchievementIndexKey, 0);
+    currentLevel = UserDefault::getInstance()->getIntegerForKey(kCurrentLevelKey, 0);
+    currentCoins = UserDefault::getInstance()->getIntegerForKey(kCurrentCoinsKey, 0);
+    
 }
 
 void GameConfig::save() {
     // use user defaults here
-    UserDefault::getInstance()->setIntegerForKey("config_version", version);
+    UserDefault::getInstance()->setIntegerForKey(kCurrentAchievementIndexKey, currentAchievementIndex);
+    UserDefault::getInstance()->setIntegerForKey(kCurrentLevelKey, currentLevel);
+    UserDefault::getInstance()->setIntegerForKey(kCurrentCoinsKey, currentCoins);
     
 }

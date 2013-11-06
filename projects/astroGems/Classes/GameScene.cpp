@@ -6,6 +6,7 @@
 #include "GameConfig.h"
 #include "SimpleAudioEngine.h"
 #include "AchievementsUI.h"
+#include "LevelUpUI.h"
 
 using namespace CocosDenshion;
 
@@ -17,9 +18,14 @@ GameScene::~GameScene() {
 GameScene::GameScene() {
     field = nullptr;
     back = nullptr;
+    ui = nullptr;
+    achievementsUI = nullptr;
+    levelUpUI = nullptr;
     
     currentScore = 0;
     currentRainbowGems = 0;
+    state = GSS_Normal;
+    currentBackgroundIndex = 0;
     //timeLeft = GameConfig::sharedInstance()->gameTimer;
     
     //gameOver = true;
@@ -44,6 +50,12 @@ Scene * GameScene::scene() {
 
     achievementsUI->setGameLayer(gameLayer);
     gameLayer->setAchievementsUI(achievementsUI);
+    
+    LevelUpUI *levelUpUI = LevelUpUI::create();
+    scene->addChild(levelUpUI);
+
+    gameLayer->setLevelUpUI(levelUpUI);
+    levelUpUI->setGameLayer(gameLayer);
     
     // start should be here instead
     gameLayer->reset();
@@ -77,22 +89,25 @@ bool GameScene::init() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Point origin = Director::getInstance()->getVisibleOrigin();
 
-    back = Sprite::create("backgrounds/bgr04.jpg");
+    currentBackgroundIndex = GameConfig::sharedInstance()->currentLevel % kNumberOfBackgrounds;
+    
+    String *backgroundFileName = String::createWithFormat("backgrounds/bgr%i.jpg", currentBackgroundIndex);
+    back = Sprite::create(backgroundFileName->getCString());
     back->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 
-    this->addChild(back, 0);
+    this->addChild(back, zBackground);
     
     Sprite *grid = Sprite::create("field/grid.png");
     grid->setPosition({visibleSize.width / 2, visibleSize.height / 2});
     
     GameConfig::sharedInstance()->gridPos = grid->getPosition();
     
-    this->addChild(grid);
+    this->addChild(grid, zGrid);
     
     field = GemField::create();
     field->addWatcher(this);
     
-    this->addChild(field);
+    this->addChild(field, zField);
     
     float posX = (visibleSize.width - kTileSize * (kFieldWidth)) / 2;
 	float posY = (visibleSize.height - kTileSize * (kFieldHeight)) / 2;
@@ -154,13 +169,27 @@ void GameScene::onGemDestroyed(GemColour colour, int x, int y, int score) {
         this->applyCoins(1, x, y);
     }
     
-    setScore(currentScore + score * scoreMultiplier.multiplier);
+    this->setScore(currentScore + score * scoreMultiplier.multiplier);
+    
+    if(state == GSS_Normal && currentScore > GameConfig::sharedInstance()->currentLevel * 1000) {
+        this->setState(GSS_LevelUp);
+        this->putOn(levelUpUI);
+        
+        CCLOG("put in destr");
+    }
 }
 
 void GameScene::onGemsMatched(int length, GemColour colour, int startX, int startY, int endX, int endY, int score) {
-    applyScoreMultiplierProgress(length);
+    this->applyScoreMultiplierProgress(length);
 
-    setScore(currentScore + score * scoreMultiplier.multiplier);
+    this->setScore(currentScore + score * scoreMultiplier.multiplier);
+    
+    if(state == GSS_Normal && currentScore > GameConfig::sharedInstance()->currentLevel * 1000) {
+        this->setState(GSS_LevelUp);
+        this->putOn(levelUpUI);
+        
+        CCLOG("put in match");
+    }
 }
 
 void GameScene::onGemsToBeShuffled() {
@@ -326,9 +355,11 @@ void GameScene::takeOff() {
 	blackout->runAction(showEffect);
 
 	Sequence *showAction = Sequence::create(CallFuncN::create(CC_CALLBACK_0(GameScene::enableTouches, this)),
-                                            //CallFuncN::create(CC_CALLBACK_0(GameScene::updatePlayerPosition, this)),
+                                            CallFunc::create([this]() {
+                                                this->setState(GSS_Normal);
+                                            }),
                                             NULL);
-	this->runAction(Sequence::create(DelayTime::create(2), showAction, NULL));
+	this->runAction(Sequence::create(DelayTime::create(kStackTransitionTime), showAction, NULL));
 }
 
 void GameScene::disableTouches() {
@@ -369,6 +400,10 @@ void GameScene::setAchievementsUI(AchievementsUI *ui) {
     this->achievementsUI = ui;
 }
 
+void GameScene::setLevelUpUI(LevelUpUI *ui) {
+    this->levelUpUI = ui;
+}
+
 void GameScene::applyScoreMultiplierProgress(float progress) {
     switch(scoreMultiplier.state) {
         case ScoreMultiplier::SMS_Active:
@@ -404,6 +439,18 @@ void GameScene::setScoreMultiplierProgress(float progress) {
     ui->setScoreMultiplierProgress(100 * (scoreMultiplier.currentProgress / kScoreMultiplierMaxProgress));
 }
 
+void GameScene::setCurrentLevel(int level) {
+    GameConfig::sharedInstance()->currentLevel = level;
+    
+    ui->setLevel(level);
+    
+    //setState(GSS_Normal);
+}
+
+void GameScene::setState(GameScene::GameSceneState state) {
+    this->state = state;
+}
+
 //void GameScene::setTimeLeft(float time) {
 //    if(timeLeft <= 0) {
 //        timeLeft = 0;
@@ -426,6 +473,22 @@ void GameScene::applyCoins(int coins, int fromX, int fromY) {
     Point pos = this->convertFieldCoordinatesToWorldLocation({fromX, fromY});
     
     ui->setCoins(GameConfig::sharedInstance()->currentCoins, pos.x, pos.y);
+}
+
+void GameScene::applyNextBackground() {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+
+    back->removeFromParent();
+    
+    currentBackgroundIndex++;
+    currentBackgroundIndex = currentBackgroundIndex % kNumberOfBackgrounds;
+    
+    String *fileName = String::createWithFormat("backgrounds/bgr%i.jpg", currentBackgroundIndex);
+    back = Sprite::create(fileName->getCString());
+
+    back->setPosition({visibleSize.width / 2, visibleSize.height / 2});
+    
+    this->addChild(back, zBackground);
 }
 
 #pragma mark - touches

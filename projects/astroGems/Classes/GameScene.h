@@ -11,9 +11,16 @@ USING_NS_CC;
 class GemField;
 class GameUI;
 class AchievementsUI;
+class LevelUpUI;
 
 class GameScene: public cocos2d::Layer, public FieldWatcherDelegate, public StackableLayer {
 public:
+    enum GameSceneState {
+        GSS_Normal,
+        GSS_LevelUp,
+        GSS_AchievementUnlocked
+    } state;
+    
     virtual ~GameScene();
     GameScene();
     // cocos2d stuff
@@ -62,21 +69,28 @@ public:
     // some setters/getters
     void setUI(GameUI *ui);
     void setAchievementsUI(AchievementsUI *ui);
+    void setLevelUpUI(LevelUpUI *ui);
     
     void setScore(int score);
     void applyScoreMultiplierProgress(float progress);
     void setScoreMultiplierProgress(float progress);
+    void setCurrentLevel(int level);
         
     void applyCoins(int coins, int fromX, int fromY);
     
+    void applyNextBackground();
+    
     // update logic
     void update(float dt);
+private:
+    void setState(GameSceneState state);
 private:
     GemField *field;
     Sprite *back;
     
     GameUI *ui;
     AchievementsUI *achievementsUI;
+    LevelUpUI *levelUpUI;
     
     bool swipeEnded;
 	bool canTouch;
@@ -120,6 +134,7 @@ private:
 
     int currentScore;
     int currentRainbowGems;
+    int currentBackgroundIndex;
     
     Point firstTouchLocation;
 };

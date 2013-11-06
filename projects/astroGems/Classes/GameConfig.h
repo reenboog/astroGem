@@ -46,13 +46,14 @@ public:
     float hypercubeIconValue;
     
     int currentCoins;
-    
+    int currentLevel;
     int currentAchievementIndex;
     
     AchievementPool achievements;
     
     // required to align ui
     cocos2d::Point gridPos;
+    cocos2d::Point levelLabelGUIPos;
 };
 
 #endif /* defined(___pGigTickets__GameConfig__) */

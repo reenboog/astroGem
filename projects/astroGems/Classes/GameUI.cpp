@@ -119,6 +119,8 @@ bool GameUI::init() {
     levelLabel->setPosition({visibleSize.width * 0.98, gridPos.y + gridSize.height / 2.0 + multiplierProgressMount->getContentSize().height});
     levelLabel->setAnchorPoint({1.0f, 0.0f});
     
+    GameConfig::sharedInstance()->levelLabelGUIPos = levelLabel->getPosition();
+    
     this->addChild(levelLabel);
     
     // score
