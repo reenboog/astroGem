@@ -61,6 +61,7 @@
 #define kStackShadowOpacity 170
 
 #define kNumberOfBackgrounds 21
+#define kNumberOfAchievements 79
 
 const bool kPreloadField = false;
 

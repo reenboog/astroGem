@@ -11,6 +11,7 @@ USING_NS_CC;
 class GemField;
 class GameUI;
 class AchievementsUI;
+class AchievementUnlockedUI;
 class LevelUpUI;
 
 class GameScene: public cocos2d::Layer, public FieldWatcherDelegate, public StackableLayer {
@@ -70,11 +71,13 @@ public:
     void setUI(GameUI *ui);
     void setAchievementsUI(AchievementsUI *ui);
     void setLevelUpUI(LevelUpUI *ui);
+    void setAchievementUnlockedUI(AchievementUnlockedUI *ui);
     
     void setScore(int score);
     void applyScoreMultiplierProgress(float progress);
     void setScoreMultiplierProgress(float progress);
     void setCurrentLevel(int level);
+    void setCurrentAchievementIndex(int index);
         
     void applyCoins(int coins, int fromX, int fromY);
     
@@ -90,6 +93,7 @@ private:
     
     GameUI *ui;
     AchievementsUI *achievementsUI;
+    AchievementUnlockedUI *achievementUnlockedUI;
     LevelUpUI *levelUpUI;
     
     bool swipeEnded;

@@ -6,6 +6,7 @@
 #include "GameConfig.h"
 #include "SimpleAudioEngine.h"
 #include "AchievementsUI.h"
+#include "AchievementUnlockedUI.h"
 #include "LevelUpUI.h"
 
 using namespace CocosDenshion;
@@ -20,6 +21,7 @@ GameScene::GameScene() {
     back = nullptr;
     ui = nullptr;
     achievementsUI = nullptr;
+    achievementUnlockedUI = nullptr;
     levelUpUI = nullptr;
     
     currentScore = 0;
@@ -57,6 +59,12 @@ Scene * GameScene::scene() {
     gameLayer->setLevelUpUI(levelUpUI);
     levelUpUI->setGameLayer(gameLayer);
     
+    AchievementUnlockedUI *achievementUnlockedUI = AchievementUnlockedUI::create();
+    scene->addChild(achievementUnlockedUI);
+
+    achievementUnlockedUI->setGameLayer(gameLayer);
+    gameLayer->setAchievementUnlockedUI(achievementUnlockedUI);
+    
     // start should be here instead
     gameLayer->reset();
     
@@ -77,6 +85,7 @@ bool GameScene::init() {
     
     // add sprite sheets
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gems/gems.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("achievements/achievements.plist");
     
     // preload effects and music
     SimpleAudioEngine::getInstance()->preloadEffect("gemMatch.mp3");
@@ -171,11 +180,16 @@ void GameScene::onGemDestroyed(GemColour colour, int x, int y, int score) {
     
     this->setScore(currentScore + score * scoreMultiplier.multiplier);
     
-    if(state == GSS_Normal && currentScore > GameConfig::sharedInstance()->currentLevel * 1000) {
+    int levelUpScores = 0;
+    
+    for(int i = 1; i <= MIN(GameConfig::sharedInstance()->currentLevel, 7); ++i) {
+        levelUpScores += i * kScoresPerLevel;
+    }
+    
+    if(state == GSS_Normal && currentScore > levelUpScores) {
         this->setState(GSS_LevelUp);
-        this->putOn(levelUpUI);
-        
-        CCLOG("put in destr");
+        //this->putOn(levelUpUI);
+        this->putOn(achievementUnlockedUI);
     }
 }
 
@@ -184,11 +198,16 @@ void GameScene::onGemsMatched(int length, GemColour colour, int startX, int star
 
     this->setScore(currentScore + score * scoreMultiplier.multiplier);
     
-    if(state == GSS_Normal && currentScore > GameConfig::sharedInstance()->currentLevel * 1000) {
+    int levelUpScores = 0;
+    
+    for(int i = 1; i <= MIN(GameConfig::sharedInstance()->currentLevel, 7); ++i) {
+        levelUpScores += i * kScoresPerLevel;
+    }
+    
+    if(state == GSS_Normal && currentScore > levelUpScores) {
         this->setState(GSS_LevelUp);
-        this->putOn(levelUpUI);
-        
-        CCLOG("put in match");
+        //this->putOn(levelUpUI);
+        this->putOn(achievementUnlockedUI);
     }
 }
 
@@ -404,6 +423,10 @@ void GameScene::setLevelUpUI(LevelUpUI *ui) {
     this->levelUpUI = ui;
 }
 
+void GameScene::setAchievementUnlockedUI(AchievementUnlockedUI *ui) {
+    this->achievementUnlockedUI = ui;
+}
+
 void GameScene::applyScoreMultiplierProgress(float progress) {
     switch(scoreMultiplier.state) {
         case ScoreMultiplier::SMS_Active:
@@ -445,6 +468,12 @@ void GameScene::setCurrentLevel(int level) {
     ui->setLevel(level);
     
     //setState(GSS_Normal);
+}
+
+void GameScene::setCurrentAchievementIndex(int index) {
+    GameConfig::sharedInstance()->currentAchievementIndex++;
+    
+    // save?
 }
 
 void GameScene::setState(GameScene::GameSceneState state) {

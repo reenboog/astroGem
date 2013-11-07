@@ -141,6 +141,8 @@ void AchievementsUI::onEnter() {
 }
 
 void AchievementsUI::popUp(StackableLayer *baseLayer) {
+    tableView->reloadData();
+
     this->onEnter();
     
 	this->disableTouches();
@@ -252,7 +254,7 @@ AchievementTableViewCell::~AchievementTableViewCell() {
 AchievementTableViewCell::AchievementTableViewCell(int itemId) {
     //itemId = itemId - 1;
     
-    String *fileName = String::createWithFormat("achievements/%s%i.png", kAchievementPrefix, itemId);
+    String *fileName = String::createWithFormat("%s%i.png", kAchievementPrefix, itemId);
     
     background = Sprite::create("ui/achievementItemMount.png");
     background->setPosition(Point::ZERO);
@@ -260,7 +262,7 @@ AchievementTableViewCell::AchievementTableViewCell(int itemId) {
     
     this->addChild(background);
     
-    icon = Sprite::create(fileName->getCString());
+    icon = Sprite::createWithSpriteFrameName(fileName->getCString());
     icon->setPosition({background->getContentSize().width * 0.08, background->getContentSize().height * 0.5});
     
     background->addChild(icon);

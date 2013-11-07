@@ -15,9 +15,11 @@
 #define kAppVersion         1
 #define kGameTimer          60
 
-#define kBaseIconValue      50
-#define kFourInRowIconValue 500
-#define kHypercubeIconValue 1000
+#define kBaseIconValue      30
+#define kFourInRowIconValue 50
+#define kHypercubeIconValue 100
+
+#define kScoresPerLevel (kBaseIconValue * kFieldWidth * kFieldHeight * 2)
 
 #define kInitialRainbowGemsRequiredAchievement 2
 

@@ -46,7 +46,7 @@ void GameConfig::load() {
     
     currentAchievementIndex = 0;
     currentCoins = 0;
-    currentLevel = 0;
+    currentLevel = 1;
 
     int itemIndex = 0;
     
@@ -66,7 +66,7 @@ void GameConfig::load() {
     } while(continueLoop);
     
     currentAchievementIndex = UserDefault::getInstance()->getIntegerForKey(kCurrentAchievementIndexKey, 0);
-    currentLevel = UserDefault::getInstance()->getIntegerForKey(kCurrentLevelKey, 0);
+    currentLevel = UserDefault::getInstance()->getIntegerForKey(kCurrentLevelKey, 1);
     currentCoins = UserDefault::getInstance()->getIntegerForKey(kCurrentCoinsKey, 0);
     
 }
