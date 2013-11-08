@@ -113,10 +113,10 @@ bool GameUI::init() {
     pauseBtn->setAnchorPoint({0.5, 1});
     pauseBtn->setPosition({0, 0});
     
-    LabelBMFont *pauseLabel = LabelBMFont::create("Achievements", "time.fnt");//Localized::getString("achievements").c_str()
-    pauseLabel->setPosition({pauseBtn->getContentSize().width / 2, pauseBtn->getContentSize().height / 2});
-    pauseLabel->setScaleX(0.9);
-    pauseLabel->setScaleY(0.7);
+    LabelBMFont *pauseLabel = LabelBMFont::create(Localized::getString("achievements").c_str(), "achievementTableCell.fnt");
+    pauseLabel->setPosition({pauseBtn->getContentSize().width / 2, pauseBtn->getContentSize().height * 0.4});
+//    pauseLabel->setScaleX(0.9);
+    //pauseLabel->setScaleY(0.6);
     pauseLabel->setOpacity(200);
     
     pauseBtn->addChild(pauseLabel);
@@ -127,7 +127,7 @@ bool GameUI::init() {
     this->addChild(pauseMenu);
     
     // level
-    levelLabel = LabelBMFont::create("12", "time.fnt");
+    levelLabel = LabelBMFont::create("0", "achievementTableCell.fnt");
     levelLabel->setPosition({visibleSize.width * 0.98, gridPos.y + gridSize.height / 2.0 + multiplierProgressMount->getContentSize().height});
     levelLabel->setAnchorPoint({1.0f, 0.0f});
     
@@ -137,7 +137,7 @@ bool GameUI::init() {
     
     // score
     
-    scoreLabel = LabelBMFont::create("110", "time.fnt");
+    scoreLabel = LabelBMFont::create("0", "achievementTableCell.fnt");
     scoreLabel->setPosition({visibleSize.width * 0.02, gridPos.y + gridSize.height / 2.0 + multiplierProgressMount->getContentSize().height});
     scoreLabel->setAnchorPoint({0.0f, 0.0f});
     
@@ -156,10 +156,10 @@ bool GameUI::init() {
     this->addChild(coinsMenu);
     
     // coins label
-    coinsLabel = LabelBMFont::create("999", "time.fnt");
-    coinsLabel->setPosition({coinsBtn->getContentSize().width * 0.7, coinsBtn->getContentSize().height * 0.5});
+    coinsLabel = LabelBMFont::create("0", "achievementTableCell.fnt");
+    coinsLabel->setPosition({coinsBtn->getContentSize().width * 0.7, coinsBtn->getContentSize().height * 0.43});
     coinsLabel->setAnchorPoint({1.0f, 0.5f});
-    coinsLabel->setScale(0.7);
+    coinsLabel->setScale(0.8);
     
     coinsBtn->addChild(coinsLabel);
     
@@ -174,9 +174,9 @@ bool GameUI::init() {
     this->addChild(makeFunMenu);
     
     // makeFun label; add locals here
-    makeFunLabel = LabelBMFont::create("Make fun", "time.fnt");
-    makeFunLabel->setPosition({makeFunBtn->getContentSize().width * 0.5, makeFunBtn->getContentSize().height * 0.5});
-    makeFunLabel->setScale(0.7);
+    makeFunLabel = LabelBMFont::create(Localized::getString("makeFun").c_str(), "achievementTableCell.fnt");
+    makeFunLabel->setPosition({makeFunBtn->getContentSize().width * 0.5, makeFunBtn->getContentSize().height * 0.45});
+    makeFunLabel->setScale(0.8);
     
     makeFunBtn->addChild(makeFunLabel);
     
@@ -185,7 +185,7 @@ bool GameUI::init() {
     shuffleMount->setAnchorPoint({1, 0.5});
     shuffleMount->setPosition({0, visibleSize.height / 2});
     
-    LabelBMFont *shuffleLabel = LabelBMFont::create(Localized::getString("noMoves").c_str(), "time.fnt");
+    LabelBMFont *shuffleLabel = LabelBMFont::create(Localized::getString("noMoves").c_str(), "achievementTableCell.fnt");
     shuffleLabel->setAnchorPoint({1, 0.5});
     
     shuffleLabel->setPosition({shuffleMount->getContentSize().width * 0.9, shuffleMount->getContentSize().height / 2});

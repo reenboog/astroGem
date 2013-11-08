@@ -182,7 +182,7 @@ void GameScene::onGemDestroyed(GemColour colour, int x, int y, int score) {
     this->putOnLevelUpUIIfReady();
     
     // temporal
-    ui->showShufflePopup();
+    //ui->showShufflePopup();
 }
 
 void GameScene::onGemsMatched(int length, GemColour colour, int startX, int startY, int endX, int endY, int score) {

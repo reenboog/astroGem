@@ -513,7 +513,7 @@ void Gem::destroy(float delay) {
                         labelColor = {50, 255, 50};
                         break;
                     case GC_Blue:
-                        labelColor = {50, 50, 255};
+                        labelColor = {80, 80, 255};
                         break;
                     case GC_Purple:
                         labelColor = {255, 50, 255};
@@ -536,7 +536,7 @@ void Gem::destroy(float delay) {
                 String scoreStr;
                 scoreStr.appendWithFormat("%i", Gem::scoreForGem(getType()));
 
-                LabelBMFont *label = LabelBMFont::create(scoreStr.getCString(), "redCircle52.fnt");
+                LabelBMFont *label = LabelBMFont::create(scoreStr.getCString(), "gemScores.fnt");
 
                 label->setPosition(this->getPosition());
                 label->setOpacity(0);

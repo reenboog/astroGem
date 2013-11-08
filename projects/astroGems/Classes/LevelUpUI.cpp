@@ -58,14 +58,14 @@ bool LevelUpUI::init() {
     this->addChild(star);
     
     // "LevelUp" label
-    levelUpLabel = LabelBMFont::create(Localized::getString("levelUp").c_str(), "time.fnt");
+    levelUpLabel = LabelBMFont::create(Localized::getString("levelUp").c_str(), "achievementTableCell.fnt");
     //levelUpLabel->setAnchorPoint({1, 0.5});
     levelUpLabel->setPosition({labelMount->getContentSize().width * 0.6, labelMount->getContentSize().height * 0.5});
     
     labelMount->addChild(levelUpLabel);
     
     // lv label
-    lvLabel = LabelBMFont::create("0", "time.fnt");
+    lvLabel = LabelBMFont::create("0", "levelUpLevel.fnt");
     lvLabel->setAnchorPoint({1, 0});
     lvLabel->setPosition({star->getContentSize().width * 0.5, star->getContentSize().height * 0.5});
     lvLabel->setVisible(false);
@@ -145,7 +145,7 @@ void LevelUpUI::popUp(StackableLayer *baseLayer) {
     lvLabel->setString(lvString->getCString());
     lvLabel->setVisible(true);
     lvLabel->setOpacity(0);
-    lvLabel->setPosition({star->getContentSize().width / 2 + lvLabel->getContentSize().width / 2, star->getContentSize().height / 2 - lvLabel->getContentSize().height / 2});
+    lvLabel->setPosition({star->getContentSize().width / 2 + lvLabel->getContentSize().width / 2, star->getContentSize().height / 2.08 - lvLabel->getContentSize().height / 2});
     
     Point levelPos = GameConfig::sharedInstance()->levelLabelGUIPos - starPos + Point(-lvLabel->getContentSize().width / 2, lvLabel->getContentSize().height / 2);
     

@@ -67,7 +67,7 @@ bool AchievementUnlockedUI::init() {
     this->addChild(achievementFrame);
     
     // "LevelUp" label
-    achievementLabel = LabelBMFont::create(Localized::getString("levelUp").c_str(), "time.fnt");
+    achievementLabel = LabelBMFont::create("", "achievementTableCell.fnt");
     //levelUpLabel->setAnchorPoint({1, 0.5});
     achievementLabel->setPosition({labelMount->getContentSize().width * 0.6, labelMount->getContentSize().height * 0.5});
     

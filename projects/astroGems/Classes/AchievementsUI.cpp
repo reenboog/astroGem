@@ -267,9 +267,9 @@ AchievementTableViewCell::AchievementTableViewCell(int itemId) {
     
     background->addChild(icon);
     
-    caption = LabelBMFont::create(GameConfig::sharedInstance()->achievements[itemId].description.c_str(), "time.fnt");
+    caption = LabelBMFont::create(GameConfig::sharedInstance()->achievements[itemId].description.c_str(), "achievementTableCell.fnt");
     caption->setAnchorPoint({0, 0.5});
-    caption->setPosition({background->getContentSize().width * 0.1 + icon->getContentSize().width, background->getContentSize().height * 0.5});
+    caption->setPosition({background->getContentSize().width * 0.05 + icon->getContentSize().width, background->getContentSize().height * 0.5});
     
     background->addChild(caption);
     
