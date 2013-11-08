@@ -180,6 +180,9 @@ void GameScene::onGemDestroyed(GemColour colour, int x, int y, int score) {
     this->setScore(GameConfig::sharedInstance()->currentScore + score * scoreMultiplier.multiplier);
     
     this->putOnLevelUpUIIfReady();
+    
+    // temporal
+    ui->showShufflePopup();
 }
 
 void GameScene::onGemsMatched(int length, GemColour colour, int startX, int startY, int endX, int endY, int score) {
@@ -191,7 +194,7 @@ void GameScene::onGemsMatched(int length, GemColour colour, int startX, int star
 }
 
 void GameScene::onGemsToBeShuffled() {
-	CCLOG("I'm shuffling");
+	ui->showShufflePopup();
 }
 
 void GameScene::onGemsFinishedMoving() {

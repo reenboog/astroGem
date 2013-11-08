@@ -33,6 +33,8 @@ GameUI::GameUI(): Layer() {
 
     gameLayer = nullptr;
     
+    shuffleMount = nullptr;
+    
     // forgive me for this (
     currentScoreMultiplierProgress = 0.0f;
     currentRainbowGemsProgress = 0.0f;
@@ -177,6 +179,20 @@ bool GameUI::init() {
     makeFunLabel->setScale(0.7);
     
     makeFunBtn->addChild(makeFunLabel);
+    
+    // shuffle stuff
+    shuffleMount = Sprite::create("ui/achievementLabelMount.png");
+    shuffleMount->setAnchorPoint({1, 0.5});
+    shuffleMount->setPosition({0, visibleSize.height / 2});
+    
+    LabelBMFont *shuffleLabel = LabelBMFont::create(Localized::getString("noMoves").c_str(), "time.fnt");
+    shuffleLabel->setAnchorPoint({1, 0.5});
+    
+    shuffleLabel->setPosition({shuffleMount->getContentSize().width * 0.9, shuffleMount->getContentSize().height / 2});
+    
+    shuffleMount->addChild(shuffleLabel);
+    
+    this->addChild(shuffleMount);
 
     return true;
 }
@@ -310,6 +326,18 @@ void GameUI::onCoinsBtnPressed() {
 void GameUI::onMakeFunBtnPressed() {
     gameLayer->onMakeFunBtnPressed();
     this->setMakeFunBtnEnabled(false);
+}
+
+void GameUI::showShufflePopup() {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    
+    shuffleMount->stopAllActions();
+    shuffleMount->setPosition({0, visibleSize.height / 2});
+
+    shuffleMount->runAction(Sequence::create(EaseSineOut::create(MoveBy::create(0.2, {shuffleMount->getContentSize().width * 0.9, 0})),
+                                             DelayTime::create(1),
+                                             EaseSineIn::create(MoveBy::create(0.2, {-shuffleMount->getContentSize().width * 0.9, 0})),
+                                             NULL));
 }
 
 void GameUI::setMakeFunBtnEnabled(bool enabled) {

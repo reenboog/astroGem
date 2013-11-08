@@ -36,11 +36,13 @@ public:
     //void setTimeLeft(float seconds);
     //void setScoreMultiplier(float multiplier);
     void setScoreMultiplierProgress(float progress);
-
+    
     void setRainbowGemsProgress(float progress);
     
     void onCoinsBtnPressed();
     void onMakeFunBtnPressed();
+    
+    void showShufflePopup();
     
     void setMakeFunBtnEnabled(bool enabled);
 private:
@@ -53,6 +55,8 @@ private:
     
     Menu *coinsMenu;
     MenuItemImage *coinsBtn;
+    
+    Sprite *shuffleMount;
     
     Menu *makeFunMenu;
     MenuItemImage *makeFunBtn;
