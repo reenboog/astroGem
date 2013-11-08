@@ -11,9 +11,11 @@
 
 USING_NS_CC;
 
-#define kCurrentAchievementIndexKey "currentAchievementIndex"
-#define kCurrentLevelKey "currentLevel"
-#define kCurrentCoinsKey "currentCoins"
+#define kCurrentAchievementIndexKey     "currentAchievementIndex"
+#define kCurrentLevelKey                "currentLevel"
+#define kCurrentCoinsKey                "currentCoins"
+#define kCurrentScoreKey                "currentScore"
+#define kCurrentStartYCoordOfRainbowGem "currentRainbowY"
 
 GameConfig * GameConfig::__sharedInstance = nullptr;
 
@@ -47,6 +49,8 @@ void GameConfig::load() {
     currentAchievementIndex = 0;
     currentCoins = 0;
     currentLevel = 1;
+    currentScore = 0;
+    currentStartYCoordOfRainbowGem = 0;
 
     int itemIndex = 0;
     
@@ -68,7 +72,8 @@ void GameConfig::load() {
     currentAchievementIndex = UserDefault::getInstance()->getIntegerForKey(kCurrentAchievementIndexKey, 0);
     currentLevel = UserDefault::getInstance()->getIntegerForKey(kCurrentLevelKey, 1);
     currentCoins = UserDefault::getInstance()->getIntegerForKey(kCurrentCoinsKey, 0);
-    
+    currentScore = UserDefault::getInstance()->getIntegerForKey(kCurrentScoreKey, 0);
+    currentStartYCoordOfRainbowGem = UserDefault::getInstance()->getIntegerForKey(kCurrentStartYCoordOfRainbowGem, kInitialRainbowStartYCoord);
 }
 
 void GameConfig::save() {
@@ -76,5 +81,6 @@ void GameConfig::save() {
     UserDefault::getInstance()->setIntegerForKey(kCurrentAchievementIndexKey, currentAchievementIndex);
     UserDefault::getInstance()->setIntegerForKey(kCurrentLevelKey, currentLevel);
     UserDefault::getInstance()->setIntegerForKey(kCurrentCoinsKey, currentCoins);
-    
+    UserDefault::getInstance()->setIntegerForKey(kCurrentScoreKey, currentScore);
+    UserDefault::getInstance()->setIntegerForKey(kCurrentStartYCoordOfRainbowGem, currentStartYCoordOfRainbowGem);
 }

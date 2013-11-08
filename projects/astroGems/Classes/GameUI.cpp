@@ -9,6 +9,7 @@
 #include "GameUI.h"
 #include "GameScene.h"
 #include "GameConfig.h"
+#include "Localized.h"
 
 GameUI::~GameUI() {
     
@@ -34,6 +35,7 @@ GameUI::GameUI(): Layer() {
     
     // forgive me for this (
     currentScoreMultiplierProgress = 0.0f;
+    currentRainbowGemsProgress = 0.0f;
 }
 
 #pragma mark - init
@@ -106,11 +108,19 @@ bool GameUI::init() {
 //    timeProgress->addChild(timeLabel);
     
     pauseBtn = MenuItemImage::create("pauseBtn.png", "pauseBtnOn.png", "pauseBtn.png", CC_CALLBACK_1(GameUI::onPauseBtnPressed, this));
-    //pauseBtn->setAnchorPoint({0.5, 0.7});
+    pauseBtn->setAnchorPoint({0.5, 1});
     pauseBtn->setPosition({0, 0});
     
+    LabelBMFont *pauseLabel = LabelBMFont::create("Achievements", "time.fnt");//Localized::getString("achievements").c_str()
+    pauseLabel->setPosition({pauseBtn->getContentSize().width / 2, pauseBtn->getContentSize().height / 2});
+    pauseLabel->setScaleX(0.9);
+    pauseLabel->setScaleY(0.7);
+    pauseLabel->setOpacity(200);
+    
+    pauseBtn->addChild(pauseLabel);
+    
     Menu *pauseMenu = Menu::create(pauseBtn, NULL);
-    pauseMenu->setPosition({pauseBtn->getContentSize().width * 0.8, visibleSize.height - pauseBtn->getContentSize().height * 0.8});
+    pauseMenu->setPosition({visibleSize.width * 0.5, visibleSize.height});
     
     this->addChild(pauseMenu);
     
@@ -173,6 +183,7 @@ bool GameUI::init() {
 
 void GameUI::reset() {
     currentScoreMultiplierProgress = 0.0;
+    currentRainbowGemsProgress = 0.0f;
 }
 
 #pragma mark - callbacks
@@ -282,9 +293,14 @@ void GameUI::setScoreMultiplierProgress(float progress) {
 }
 
 void GameUI::setRainbowGemsProgress(float progress) {
-    rainbowGemsProgress->stopAllActions();
+    //rainbowGemsProgress->stopAllActions();
+    if(progress != 100 && progress != 0) {
+        rainbowGemsProgress->runAction(ProgressFromTo::create(0.2, currentRainbowGemsProgress, progress));
+    } else {
+        rainbowGemsProgress->setPercentage(progress);
+    }
     
-    rainbowGemsProgress->runAction(ProgressTo::create(0.2, progress));
+    currentRainbowGemsProgress = progress;
 }
 
 void GameUI::onCoinsBtnPressed() {

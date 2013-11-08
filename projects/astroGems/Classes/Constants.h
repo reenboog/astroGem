@@ -63,6 +63,8 @@
 #define kNumberOfBackgrounds 21
 #define kNumberOfAchievements 79
 
+#define kInitialRainbowStartYCoord 4
+
 const bool kPreloadField = false;
 
 enum GemColour {

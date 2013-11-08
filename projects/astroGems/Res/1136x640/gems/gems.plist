@@ -147,6 +147,19 @@
                 <key>sourceSize</key>
                 <string>{84,80}</string>
             </dict>
+            <key>rainbowArrow.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{177,38},{42,32}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{42,32}}</string>
+                <key>sourceSize</key>
+                <string>{42,32}</string>
+            </dict>
             <key>red.png</key>
             <dict>
                 <key>frame</key>
@@ -222,7 +235,7 @@
             <key>size</key>
             <string>{256,512}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:1a3001fb18e1c5cf5ef9efa50b98470f:1/1$</string>
+            <string>$TexturePacker:SmartUpdate:46c4cf32e16fe3458ea376cb2fe7e064:1/1$</string>
             <key>textureFileName</key>
             <string>gems.png</string>
         </dict>

@@ -24,7 +24,6 @@ GameScene::GameScene() {
     achievementUnlockedUI = nullptr;
     levelUpUI = nullptr;
     
-    currentScore = 0;
     currentRainbowGems = 0;
     state = GSS_Normal;
     currentBackgroundIndex = 0;
@@ -149,7 +148,6 @@ void GameScene::onEnter() {
 }
 
 void GameScene::reset() {
-    currentScore = 0;
     //timeLeft = GameConfig::sharedInstance()->gameTimer;
     
     //gameOver = false;
@@ -160,7 +158,8 @@ void GameScene::reset() {
     
     ui->reset();
     
-    ui->setScore(currentScore);
+    ui->setScore(GameConfig::sharedInstance()->currentScore);
+    ui->setLevel(GameConfig::sharedInstance()->currentLevel);
     ui->setRainbowGemsProgress(0);
     ui->setCoins(GameConfig::sharedInstance()->currentCoins);
     ui->setMakeFunBtnEnabled(false);
@@ -178,37 +177,17 @@ void GameScene::onGemDestroyed(GemColour colour, int x, int y, int score) {
         this->applyCoins(1, x, y);
     }
     
-    this->setScore(currentScore + score * scoreMultiplier.multiplier);
+    this->setScore(GameConfig::sharedInstance()->currentScore + score * scoreMultiplier.multiplier);
     
-    int levelUpScores = 0;
-    
-    for(int i = 1; i <= MIN(GameConfig::sharedInstance()->currentLevel, 7); ++i) {
-        levelUpScores += i * kScoresPerLevel;
-    }
-    
-    if(state == GSS_Normal && currentScore > levelUpScores) {
-        this->setState(GSS_LevelUp);
-        //this->putOn(levelUpUI);
-        this->putOn(achievementUnlockedUI);
-    }
+    this->putOnLevelUpUIIfReady();
 }
 
 void GameScene::onGemsMatched(int length, GemColour colour, int startX, int startY, int endX, int endY, int score) {
     this->applyScoreMultiplierProgress(length);
 
-    this->setScore(currentScore + score * scoreMultiplier.multiplier);
+    this->setScore(GameConfig::sharedInstance()->currentScore + score * scoreMultiplier.multiplier);
     
-    int levelUpScores = 0;
-    
-    for(int i = 1; i <= MIN(GameConfig::sharedInstance()->currentLevel, 7); ++i) {
-        levelUpScores += i * kScoresPerLevel;
-    }
-    
-    if(state == GSS_Normal && currentScore > levelUpScores) {
-        this->setState(GSS_LevelUp);
-        //this->putOn(levelUpUI);
-        this->putOn(achievementUnlockedUI);
-    }
+    this->putOnLevelUpUIIfReady();
 }
 
 void GameScene::onGemsToBeShuffled() {
@@ -245,13 +224,6 @@ void GameScene::onStartedResolvinMatches(const MatchList &founMatches) {
 void GameScene::onRainbowGemDestroyed(int x, int y) {
     currentRainbowGems++;
     
-    if(currentRainbowGems >= GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement) {
-        currentRainbowGems = GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement;
-        //GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement++;
-        
-        // show all the magic here;
-    }
-    
     // apply visual effect here
     Sprite *rainbow = Sprite::createWithSpriteFrameName("rainbow.png");
     rainbow->setPosition(this->convertFieldCoordinatesToWorldLocation({x, y}));
@@ -265,6 +237,10 @@ void GameScene::onRainbowGemDestroyed(int x, int y) {
                                             ui->setRainbowGemsProgress(100 * (currentRainbowGems / GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement));
                                             field->setState(FS_Destroying);
         
+                                            if(currentRainbowGems >= GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement) {
+                                                this->putOn(achievementUnlockedUI);
+                                            }
+
                                             rainbow->removeFromParent();
                                         }),
                                         NULL));
@@ -378,7 +354,14 @@ void GameScene::takeOff() {
                                                 this->setState(GSS_Normal);
                                             }),
                                             NULL);
+
 	this->runAction(Sequence::create(DelayTime::create(kStackTransitionTime), showAction, NULL));
+    
+    // should we clear rainbow gems progress?
+    if(currentRainbowGems >= GameConfig::sharedInstance()->rainbowGemsRequiredForAchievement) {
+        currentRainbowGems = 0;
+        ui->setRainbowGemsProgress(0);
+    }
 }
 
 void GameScene::disableTouches() {
@@ -407,6 +390,27 @@ void GameScene::enableTouches() {
 		touchBlocker->removeFromParentAndCleanup(true);
 		touchBlocker = nullptr;
 	}
+}
+
+#pragma mark - 
+void GameScene::putOnLevelUpUIIfReady() {
+    int levelUpScores = 0;
+    
+    for(int i = 1; i <= MIN(GameConfig::sharedInstance()->currentLevel, 7); ++i) {
+        levelUpScores += i * kScoresPerLevel;
+    }
+    
+    if(state == GSS_Normal && GameConfig::sharedInstance()->currentScore > levelUpScores) {
+        this->setState(GSS_LevelUp);
+        this->putOn(levelUpUI);
+        
+        // move up initial y of rainbow gem
+        GameConfig::sharedInstance()->currentStartYCoordOfRainbowGem--;
+        
+        if(GameConfig::sharedInstance()->currentStartYCoordOfRainbowGem < 0) {
+            GameConfig::sharedInstance()->currentStartYCoordOfRainbowGem = 0;
+        }
+    }
 }
 
 #pragma mark - setters/getters
@@ -491,9 +495,9 @@ void GameScene::setState(GameScene::GameSceneState state) {
 //}
 
 void GameScene::setScore(int score) {
-    currentScore = score;
+    GameConfig::sharedInstance()->currentScore = score;
     
-    ui->setScore(currentScore);
+    ui->setScore(score);
 }
 
 void GameScene::applyCoins(int coins, int fromX, int fromY) {    

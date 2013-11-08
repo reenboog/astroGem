@@ -120,7 +120,7 @@ bool GemField::init() {
 			{0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0},
+            {0,0,0,7,0,0,0,0},
             {0,0,0,0,0,0,0,0}
 		};
         
@@ -719,7 +719,7 @@ void GemField::swapGems(int fromX, int fromY, int toX, int toY) {
         
         state = FS_SwappingTwoHypercubes;
         
-    } else if(first->getType() == GT_Hypercube || second->getType() == GT_Hypercube) {
+    } else if((first->getType() == GT_Hypercube || second->getType() == GT_Hypercube) && !(first->getGemColour() == GC_Rainbow || second->getGemColour() == GC_Rainbow)) {
         skipMatchLookup = true;
         
         Gem *hypercubeMaker = nullptr;
@@ -871,9 +871,11 @@ void GemField::swipeAction(const Point &startCoordinates, int direction) {
             //file = "click2.wav";
 			deselectGem(selectedGemCoordinates->x, selectedGemCoordinates->y);
 		}
-		if(fieldMask[fromY][fromX] == 1 && freezeMask[fromY][fromX] == 0 && fieldMask[toY][toX] == 1  && freezeMask[toY][toX] == 0 &&
-           !((gems[fromY][fromX]->getGemColour() == GC_Hypercube && gems[toY][toX]->getGemColour() == GC_Rainbow) ||
-             (gems[toY][toX]->getGemColour() == GC_Hypercube && gems[fromY][fromX]->getGemColour() == GC_Rainbow))) {
+		if(fieldMask[fromY][fromX] == 1 && freezeMask[fromY][fromX] == 0 && fieldMask[toY][toX] == 1  && freezeMask[toY][toX] == 0
+           //&&
+           //!((gems[fromY][fromX]->getGemColour() == GC_Hypercube && gems[toY][toX]->getGemColour() == GC_Rainbow) ||
+           //  (gems[toY][toX]->getGemColour() == GC_Hypercube && gems[fromY][fromX]->getGemColour() == GC_Rainbow))
+           ) {
             Gem *first = gems[fromY][fromX];
             Gem *second = gems[toY][toX];
 
@@ -1067,7 +1069,7 @@ void GemField::update(float dt) {
                     
                     if(!isThereAnyRainbowGemAlready && (CCRANDOM_0_1() * 10) > 6) {
                         int rainbowGemX = clampf(CCRANDOM_0_1() * kFieldWidth, 3, kFieldWidth - 4);
-                        int rainbowGemY = 0;
+                        int rainbowGemY = GameConfig::sharedInstance()->currentStartYCoordOfRainbowGem;
                         
                         if(fieldMask[rainbowGemY][rainbowGemX] != 1) {
                             for(int i = 0; i < kFieldHeight; i++) {
@@ -1369,7 +1371,7 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
 				} else {
                     // If the gem is not destroyed - move it down
 					distanceBetweenEmpty++;
-					this->moveGem(lineNumber, y, lineNumber, y + destroyedGems + emptyBlocks, columnsWithMatches, playFallEffect);
+					this->moveGem(lineNumber, y, lineNumber, y + destroyedGems + emptyBlocks, columnsWithMatches, true);
                     
                     playFallEffect = false;
 
@@ -1420,7 +1422,7 @@ void GemField::refillLine(int lineNumber, int direction, bool reset) {
 				}
 				gems[y][lineNumber]->reset(lineNumber, y - destroyedGems - emptyBlocks, colour, type);
                 
-				gems[y][lineNumber]->fallTo(lineNumber, y, gemsFallen, columnsWithMatches, playFallEffect);
+				gems[y][lineNumber]->fallTo(lineNumber, y, gemsFallen, columnsWithMatches, true);
                 
                 playFallEffect = false;
 				gemsFallen++;

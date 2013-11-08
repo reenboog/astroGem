@@ -63,6 +63,7 @@ private:
     GameScene *gameLayer;
     
     float currentScoreMultiplierProgress;
+    float currentRainbowGemsProgress;
 };
 
 #endif /* defined(__astroGems__GameUI__) */

@@ -59,6 +59,8 @@ public:
 	virtual void disableTouches();
 	virtual void enableTouches();
     
+    void putOnLevelUpUIIfReady();
+    
     //void setTimeLeft(float time);
     
     void onEnter();
@@ -136,7 +138,6 @@ private:
         float activityTimer;
     } scoreMultiplier;
 
-    int currentScore;
     int currentRainbowGems;
     int currentBackgroundIndex;
     

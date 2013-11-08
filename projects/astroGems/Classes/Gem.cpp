@@ -50,6 +50,7 @@ void Gem::init(int x, int y, GemColour colour, GemType type) {
 	this->state = GS_Idle;
 
     setGemColour(colour);
+    applyBonusStyling();
 
 	setPosition(convertCoordinatesToPixels(x,y));
 	setZOrder(zOrder);
@@ -72,6 +73,7 @@ void Gem::reset(int x, int y, GemColour colour, GemType type) {
     this->stopAllActions();
     
     setGemColour(colour);
+    applyBonusStyling();
     
     setPosition(convertCoordinatesToPixels(x,y));
     
@@ -151,6 +153,32 @@ void Gem::onTransformationEnd(Object *sender) {
 void Gem::applyBonusStyling() {
 	// Add bonus styling
     switch(type) {
+        case GT_RainbowMaker: {
+            
+            Point arrowPos = {this->getContentSize().width / 2, this->getContentSize().height / 2};
+            
+            Sprite *arrow = Sprite::createWithSpriteFrameName("rainbowArrow.png");
+            arrow->setPosition(arrowPos);
+            arrow->setOpacity(0);
+
+            this->addChild(arrow);
+            
+            arrow->runAction(RepeatForever::create(Sequence::create(Spawn::create(MoveBy::create(1, {0, -arrow->getContentSize().height * 0.9}),
+                                                                                  Sequence::create(FadeIn::create(0.2),
+                                                                                                   DelayTime::create(0.3),
+                                                                                                   FadeOut::create(0.5),
+                                                                                                   NULL),
+                                                                                  Sequence::create(TintTo::create(0.2, 125, 255, 125),
+                                                                                                   DelayTime::create(0.2),
+                                                                                                   TintTo::create(0.2, 255, 125, 125),
+                                                                                                   DelayTime::create(0.2),
+                                                                                                   TintTo::create(0.2, 125, 125, 255),
+                                                                                                   NULL),
+                                                                                  NULL),
+                                                                    Place::create(arrowPos),
+                                                                    DelayTime::create(1.5),
+                                              NULL)));
+        } break;
         case GT_Cross: {
             Point pos = {this->getContentSize().width / 2.0f, this->getContentSize().height / 2.0f};
 
@@ -430,20 +458,25 @@ void Gem::prepareToExplodeByHypercube() {
 void Gem::setGemColour(GemColour color) {
     string fileName = "";
     
-    switch(color) {
-        case GC_Red: fileName = "red.png"; break;;
-		case GC_Green: fileName = "green.png"; break;
-        case GC_Blue: fileName = "blue.png"; break;
-		case GC_Purple: fileName = "purple.png"; break;
-        case GC_Yellow: fileName = "yellow.png"; break;
-		case GC_Orange: fileName = "orange.png"; break;
-        case GC_White: fileName = "white.png"; break;
-        case GC_Hypercube: fileName = "hyperCube.png"; break;
-        case GC_Rainbow: fileName = "rainbow.png"; break;
-        case GC_Coin: fileName = "coin.png"; break;
-            
-        default: CCLOG("default gem color in reset!");
-	}
+    if(type != GT_Hypercube) {
+        switch(color) {
+            case GC_Red: fileName = "red.png"; break;;
+            case GC_Green: fileName = "green.png"; break;
+            case GC_Blue: fileName = "blue.png"; break;
+            case GC_Purple: fileName = "purple.png"; break;
+            case GC_Yellow: fileName = "yellow.png"; break;
+            case GC_Orange: fileName = "orange.png"; break;
+            case GC_White: fileName = "white.png"; break;
+            case GC_Hypercube: fileName = "hyperCube.png"; break;
+            case GC_Rainbow: fileName = "rainbow.png"; break;
+            case GC_Coin: fileName = "coin.png"; break;
+                
+            default: CCLOG("default gem color in reset!");
+        }
+    } else {
+        fileName = "hyperCube.png";
+    }
+    
     if(getTexture() == nullptr) {
         initWithSpriteFrameName(fileName.c_str());
     } else {

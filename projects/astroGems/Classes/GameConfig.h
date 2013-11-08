@@ -21,8 +21,7 @@
 
 #define kScoresPerLevel (kBaseIconValue * kFieldWidth * kFieldHeight * 2)
 
-#define kInitialRainbowGemsRequiredAchievement 2
-
+#define kInitialRainbowGemsRequiredAchievement 4
 
 class GameConfig {
 private:
@@ -50,6 +49,8 @@ public:
     int currentCoins;
     int currentLevel;
     int currentAchievementIndex;
+    int currentScore;
+    int currentStartYCoordOfRainbowGem;
     
     AchievementPool achievements;
     
